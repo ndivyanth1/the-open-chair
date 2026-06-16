@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>The Open Chair — Beyond Silence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --ink:#120d08;--deep:#1a140d;--card:#241c13;--card-2:#2b2218;
+    --line:rgba(244,236,220,.08);--line-2:rgba(244,236,220,.14);
+    --cream:#F6EEDF;--muted:rgba(246,238,223,.66);--faint:rgba(246,238,223,.40);
+    --amber:#F4B45E;--amber-2:#FFCE86;--amber-deep:#db923f;
+    --sage:#9BE3B6;--rose:#F29A82;
+    --display:"Fraunces",Georgia,serif;--body:"Manrope",system-ui,sans-serif;--r:18px;
+    --glow:0 0 0 1px rgba(235,172,104,.0), 0 24px 60px -28px rgba(0,0,0,.85);
+    --surface:linear-gradient(157deg,#2a2014 0%,#201810 62%,#1b140d 100%);
+    --sheen:inset 0 1px 0 rgba(246,238,223,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);color:var(--cream);font-family:var(--body);
+    -webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden;
+  }
+  /* ambient breathing glow + grain */
+  body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(60% 50% at 78% 8%, rgba(235,172,104,.16), transparent 60%),
+      radial-gradient(55% 45% at 8% 4%, rgba(175,198,183,.07), transparent 60%),
+      radial-gradient(120% 80% at 50% 120%, rgba(224,150,127,.07), transparent 55%),
+      var(--ink);
+    animation:breathe 14s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{opacity:.92;}50%{opacity:1;}}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  ::selection{background:rgba(235,172,104,.32);}
+  ::-webkit-scrollbar{width:11px;height:11px;}
+  ::-webkit-scrollbar-thumb{background:rgba(246,238,223,.12);border-radius:99px;border:3px solid transparent;background-clip:content-box;}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(246,238,223,.22);background-clip:content-box;}
+  button{font-family:var(--body);cursor:pointer;}
+  .hidden{display:none!important;}
+
+  /* ---------- LAYOUT ---------- */
+  .layout{display:flex;min-height:100vh;}
+  aside{width:262px;flex:none;padding:24px 16px;display:flex;flex-direction:column;
+    position:sticky;top:0;height:100vh;
+    background:linear-gradient(180deg, rgba(36,26,16,.7), rgba(20,15,9,.55));
+    border-right:1px solid var(--line);backdrop-filter:blur(8px);}
+  .brand{display:flex;align-items:center;gap:12px;padding:0 8px 4px;}
+  .mark{width:40px;height:44px;flex:none;filter:drop-shadow(0 4px 16px rgba(235,172,104,.35));}
+  .mark rect,.mark line{fill:none;stroke:var(--cream);stroke-width:7;stroke-linecap:round;}
+  .brand b{font-family:var(--display);font-weight:450;font-size:19px;display:block;line-height:1.05;letter-spacing:-.01em;}
+  .brand small{font-size:11px;color:var(--amber);letter-spacing:.04em;}
+  nav.side{margin-top:30px;display:flex;flex-direction:column;gap:4px;}
+  nav.side button{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+    background:transparent;border:none;color:var(--muted);font-size:14.5px;font-weight:500;
+    padding:12px 15px;border-radius:13px;transition:all .22s ease;position:relative;}
+  nav.side button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s;}
+  nav.side button:hover{color:var(--cream);background:rgba(246,238,223,.045);}
+  nav.side button:hover svg{transform:translateX(2px);}
+  nav.side button.active{color:#241809;background:linear-gradient(100deg,var(--amber-2),var(--amber));
+    box-shadow:0 10px 26px -12px rgba(235,172,104,.7);font-weight:600;}
+  nav.side button.active svg{stroke:#241809;}
+  .crisis{margin-top:auto;border:1px solid rgba(224,150,127,.32);border-radius:14px;padding:13px 15px;
+    background:linear-gradient(150deg,rgba(224,150,127,.12),rgba(224,150,127,.04));}
+  .crisis b{color:var(--rose);font-size:12px;display:flex;align-items:center;gap:7px;letter-spacing:.02em;}
+  .crisis a{color:var(--cream);font-size:14px;text-decoration:none;font-weight:700;letter-spacing:.01em;}
+  .crisis small{color:var(--faint);font-size:10.5px;display:block;margin-top:2px;}
+  .adminlink{margin-top:12px;background:transparent;border:none;color:var(--faint);font-size:12.5px;
+    display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:10px;transition:all .2s;}
+  .adminlink:hover{color:var(--cream);background:rgba(246,238,223,.04);}
+
+  main{flex:1;min-width:0;}
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;
+    padding:18px 34px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(18,13,8,.86), rgba(18,13,8,.62));backdrop-filter:blur(16px) saturate(1.2);}
+  .topbar h2{font-family:var(--display);font-weight:450;font-size:21px;flex:1;letter-spacing:-.01em;}
+  .tb-btn{font-weight:600;font-size:13px;border-radius:999px;padding:9px 17px;border:1px solid var(--line-2);
+    background:rgba(246,238,223,.02);color:var(--cream);transition:all .18s;}
+  .tb-btn:hover{background:rgba(246,238,223,.07);border-color:rgba(235,172,104,.4);}
+  .tb-plus{border:none;color:#241809;background:linear-gradient(100deg,var(--amber-2),var(--amber));
+    box-shadow:0 8px 22px -10px rgba(235,172,104,.8);}
+  .tb-plus:hover{filter:brightness(1.06);}
+  .content{padding:34px;max-width:1120px;}
+
+  /* ---------- shared ---------- */
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--amber);margin:0 0 12px;}
+  h1{font-family:var(--display);font-weight:400;font-size:36px;line-height:1.12;letter-spacing:-.018em;}
+  .sub{color:var(--muted);font-size:15.5px;line-height:1.62;margin-top:10px;max-width:60ch;}
+  .back{background:rgba(246,238,223,.03);border:1px solid var(--line);color:var(--muted);font-size:13px;
+    display:inline-flex;align-items:center;gap:7px;margin-bottom:20px;padding:8px 14px;border-radius:999px;transition:all .2s;}
+  .back:hover{color:var(--cream);border-color:var(--line-2);}
+  .view{display:none;}
+  .view.active{display:block;animation:rise .55s cubic-bezier(.16,1,.3,1);}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;color:#241809;
+    background:linear-gradient(100deg,var(--amber-2),var(--amber));border:none;border-radius:999px;padding:12px 22px;
+    box-shadow:0 10px 26px -12px rgba(235,172,104,.75);transition:all .18s;position:relative;overflow:hidden;}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 16px 34px -14px rgba(235,172,104,.85);}
+  .btn.ghost{background:rgba(246,238,223,.03);color:var(--cream);box-shadow:inset 0 0 0 1px var(--line-2);}
+  .btn.ghost:hover{background:rgba(246,238,223,.07);transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgba(235,172,104,.5);}
+  .disc{margin-top:16px;font-size:12px;color:var(--faint);line-height:1.65;border-left:2px solid rgba(235,172,104,.45);padding-left:12px;}
+  .grid{display:grid;gap:16px;}
+  @media(min-width:680px){.g2{grid-template-columns:1fr 1fr;} .g3{grid-template-columns:repeat(3,1fr);}}
+
+  /* surfaces */
+  .tile,.panel-box,.person,.help,.quote,.act,.pstat,.astat,.course,.sound,.area,.reflect{
+    background:var(--surface);box-shadow:var(--sheen),0 20px 50px -34px rgba(0,0,0,.9);}
+
+  /* HOME */
+  .hero{border-radius:26px;padding:46px 34px 40px;position:relative;overflow:hidden;margin-bottom:8px;
+    background:
+      radial-gradient(70% 130% at 82% -20%, rgba(235,172,104,.30), transparent 56%),
+      radial-gradient(50% 80% at 10% 120%, rgba(175,198,183,.10), transparent 60%),
+      linear-gradient(158deg,#2f2417 0%,#1f1710 72%);
+    border:1px solid rgba(235,172,104,.20);box-shadow:0 40px 90px -50px rgba(235,172,104,.5);}
+  .hero::before{content:"";position:absolute;right:-60px;top:-80px;width:300px;height:300px;border-radius:50%;
+    background:radial-gradient(circle,rgba(235,172,104,.28),transparent 62%);animation:pulse 9s ease-in-out infinite;pointer-events:none;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.12);opacity:1;}}
+  .hero h1{font-size:44px;position:relative;}
+  .hero h1 em{font-style:italic;color:var(--amber-2);}
+  .hero .chair{position:absolute;right:34px;bottom:-14px;width:118px;opacity:.5;
+    filter:drop-shadow(0 0 30px rgba(235,172,104,.55));animation:float 7s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .hero .chair rect,.hero .chair line{fill:none;stroke:var(--cream);stroke-width:6;stroke-linecap:round;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{font-weight:500;font-size:13.5px;color:var(--cream);background:rgba(246,238,223,.04);
+    border:1px solid var(--line-2);border-radius:999px;padding:10px 17px;transition:all .2s;}
+  .chip:hover{border-color:rgba(235,172,104,.55);transform:translateY(-2px);background:rgba(235,172,104,.06);}
+  .chip.on{background:linear-gradient(100deg,var(--amber-2),var(--amber));color:#241809;border-color:transparent;font-weight:600;box-shadow:0 8px 22px -12px rgba(235,172,104,.8);}
+  .moodreply{margin-top:16px;display:none;gap:11px;border-radius:16px;padding:16px 18px;font-size:14.5px;line-height:1.6;
+    background:linear-gradient(150deg,rgba(235,172,104,.12),rgba(235,172,104,.04));border:1px solid rgba(235,172,104,.28);}
+  .moodreply.show{display:flex;animation:rise .4s ease;}
+  .moodreply .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);flex:none;margin-top:7px;box-shadow:0 0 14px var(--amber);}
+  .moodreply a{color:var(--amber-2);font-weight:600;text-decoration:none;}
+  .moodreply a:hover{text-decoration:underline;}
+  .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media(min-width:620px){.actions{grid-template-columns:repeat(5,1fr);}}
+  .act{border-radius:18px;padding:18px;border:1px solid var(--line);transition:all .24s cubic-bezier(.16,1,.3,1);text-align:left;}
+  .act:hover{transform:translateY(-4px);border-color:rgba(235,172,104,.45);box-shadow:0 26px 50px -30px rgba(235,172,104,.4);}
+  .act .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(235,172,104,.14);margin-bottom:12px;}
+  .act .ic svg{width:18px;height:18px;stroke:var(--amber-2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .act b{font-size:14px;display:block;letter-spacing:-.01em;}
+  .act small{color:var(--faint);font-size:11.5px;line-height:1.4;}
+  .act.sos .ic{background:rgba(224,150,127,.18);}.act.sos .ic svg{stroke:var(--rose);}
+  .act.sos:hover{border-color:rgba(224,150,127,.5);box-shadow:0 26px 50px -30px rgba(224,150,127,.4);}
+  .reflect{border-radius:18px;padding:28px;border:1px solid rgba(175,198,183,.24);
+    background:linear-gradient(140deg,rgba(175,198,183,.12),rgba(175,198,183,.03));}
+  .reflect p{font-family:var(--display);font-style:italic;font-weight:380;font-size:21px;line-height:1.5;}
+  .reflect span{display:block;margin-top:10px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);}
+  .quote{border:1px solid var(--line);border-radius:18px;padding:20px;}
+  .quote p{font-size:14.5px;line-height:1.6;font-style:italic;font-family:var(--display);}
+  .quote small{display:block;margin-top:12px;color:var(--faint);font-size:12px;}
+
+  /* tiles / cards */
+  .tile{border-radius:18px;padding:22px;border:1px solid var(--line);transition:all .24s cubic-bezier(.16,1,.3,1);text-align:left;width:100%;position:relative;overflow:hidden;}
+  .tile:hover{transform:translateY(-4px);border-color:rgba(235,172,104,.45);box-shadow:0 30px 60px -34px rgba(235,172,104,.45);}
+  .tile .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:15px;font-size:18px;}
+  .tile h3{font-family:var(--display);font-weight:450;font-size:18px;letter-spacing:-.01em;}
+  .tile p{margin-top:7px;color:var(--muted);font-size:13.5px;line-height:1.55;}
+  .tile .more{margin-top:14px;color:var(--amber-2);font-size:12.5px;font-weight:600;letter-spacing:.01em;}
+  .panel-box{border:1px solid var(--line);border-radius:18px;padding:22px;}
+  .twocol{display:grid;gap:16px;}
+  @media(min-width:680px){.twocol{grid-template-columns:1fr 1fr;}}
+  .label{font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);}
+  .area{border:1px solid var(--line);border-radius:14px;padding:15px 17px;display:flex;gap:11px;transition:all .2s;}
+  .area:hover{border-color:rgba(235,172,104,.35);}
+  .area i{width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none;margin-top:6px;box-shadow:0 0 10px rgba(235,172,104,.6);}
+  .area b{font-size:13.5px;}.area small{display:block;color:var(--faint);font-size:12px;margin-top:2px;}
+  .deep{border:1px solid var(--line);border-radius:18px;padding:26px;margin-top:18px;background:var(--surface);box-shadow:var(--sheen),0 20px 50px -34px rgba(0,0,0,.9);}
+  .deep h4{font-family:var(--display);font-weight:450;font-size:19px;margin-bottom:6px;}
+  .deep p{color:var(--muted);font-size:14px;line-height:1.75;margin-top:12px;}
+  .deep p b{color:var(--cream);}
+
+  /* detail gradient banner (signature) */
+  .detail-hero{position:relative;border-radius:22px;padding:30px 28px;margin-bottom:22px;overflow:hidden;
+    display:flex;gap:18px;align-items:center;
+    background:linear-gradient(125deg, color-mix(in srgb, var(--cc) 32%, #1c150e), #1b140d 78%);
+    border:1px solid color-mix(in srgb, var(--cc) 40%, transparent);
+    box-shadow:0 30px 70px -44px var(--cc);}
+  .detail-hero::after{content:"";position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle, color-mix(in srgb, var(--cc) 45%, transparent), transparent 64%);pointer-events:none;}
+  .dh-ic{width:58px;height:58px;border-radius:16px;flex:none;display:grid;place-items:center;font-size:24px;
+    background:color-mix(in srgb, var(--cc) 26%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 50%, transparent);}
+  .detail-hero h1{font-size:30px;}
+
+  /* people */
+  .person{border:1px solid var(--line);border-radius:18px;padding:20px;transition:all .22s;}
+  .person:hover{border-color:rgba(235,172,104,.32);}
+  .person .row{display:flex;align-items:center;gap:13px;}
+  .avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#221a10;flex:none;font-size:15px;box-shadow:0 8px 20px -10px rgba(0,0,0,.7);}
+  .person h4{font-size:15px;display:flex;align-items:center;gap:8px;letter-spacing:-.01em;}
+  .person .meta{color:var(--faint);font-size:12px;margin-top:2px;}
+  .pill{font-size:10px;font-weight:700;border-radius:999px;padding:3px 10px;letter-spacing:.02em;}
+  .pill.on{background:rgba(175,198,183,.18);color:var(--sage);}
+  .pill.warn{background:rgba(235,172,104,.16);color:var(--amber-2);}
+  .person .desc{display:block;color:var(--muted);font-size:13px;line-height:1.55;margin-top:13px;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px;}
+  .tags span{font-size:11px;color:var(--muted);border:1px solid var(--line-2);border-radius:999px;padding:5px 11px;background:rgba(246,238,223,.02);}
+  .notice{border:1px solid rgba(235,172,104,.3);border-radius:14px;padding:13px 16px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:18px;
+    background:linear-gradient(150deg,rgba(235,172,104,.09),rgba(235,172,104,.02));}
+
+  /* helplines */
+  .help{border:1px solid var(--line);border-radius:18px;padding:20px;}
+  .help h4{font-size:15.5px;}.help p{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:5px;}
+  .help .calls{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px;}
+  .help .calls a{text-decoration:none;font-weight:700;font-size:13.5px;color:#2a1410;
+    background:linear-gradient(100deg,#e6a896,var(--rose));border-radius:11px;padding:10px 15px;box-shadow:0 10px 24px -12px rgba(224,150,127,.7);}
+  .help .calls a.alt{background:rgba(246,238,223,.03);color:var(--cream);box-shadow:inset 0 0 0 1px var(--line-2);}
+  .sosbanner{border:1px solid rgba(224,150,127,.4);border-radius:16px;padding:18px 20px;margin-bottom:20px;font-size:13.5px;line-height:1.6;
+    background:linear-gradient(150deg,rgba(224,150,127,.14),rgba(224,150,127,.04));}
+  .sosbanner b{color:var(--rose);}
+
+  /* TOOLS */
+  .seg{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 18px;}
+  .seg button{font-size:12.5px;color:var(--muted);background:rgba(246,238,223,.02);border:1px solid var(--line-2);border-radius:999px;padding:8px 15px;}
+  .seg button.on{background:linear-gradient(100deg,var(--amber-2),var(--amber));color:#241809;border-color:transparent;font-weight:600;}
+  .sounds{display:grid;gap:11px;grid-template-columns:1fr;}
+  @media(min-width:560px){.sounds{grid-template-columns:1fr 1fr;}}
+  @media(min-width:900px){.sounds{grid-template-columns:1fr 1fr 1fr;}}
+  .sound{display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:15px;padding:14px 15px;text-align:left;transition:all .2s;}
+  .sound:hover{border-color:rgba(235,172,104,.4);transform:translateY(-2px);}
+  .sound.playing{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 16px 36px -20px rgba(235,172,104,.7);
+    background:linear-gradient(150deg,rgba(235,172,104,.14),rgba(235,172,104,.04));}
+  .sound .pp{width:32px;height:32px;border-radius:50%;background:rgba(235,172,104,.18);display:grid;place-items:center;flex:none;transition:all .2s;}
+  .sound .pp svg{width:11px;height:11px;fill:var(--amber-2);}
+  .sound.playing .pp{background:linear-gradient(100deg,var(--amber-2),var(--amber));animation:spin 8s linear infinite;}
+  .sound.playing .pp svg{fill:#241809;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .sound b{font-size:13px;display:block;}.sound small{font-size:11px;color:var(--faint);}
+
+  .breath-grid{display:grid;gap:13px;}
+  @media(min-width:680px){.breath-grid{grid-template-columns:1fr 1fr;}}
+  .borb{width:170px;height:170px;border-radius:50%;margin:26px auto 16px;
+    background:radial-gradient(circle at 38% 32%, rgba(235,172,104,.55), rgba(235,172,104,.14) 60%, transparent 76%);
+    border:1px solid rgba(235,172,104,.45);display:grid;place-items:center;transform:scale(.7);
+    transition:transform 4s ease-in-out;box-shadow:0 0 60px -10px rgba(235,172,104,.5);}
+  .borb span{font-family:var(--display);font-style:italic;font-size:19px;}
+  .breath-session{text-align:center;}
+  .breath-session .ph{font-family:var(--display);font-size:23px;color:var(--amber-2);}
+  .breath-session .ct{font-size:42px;font-weight:700;margin-top:4px;font-family:var(--display);}
+
+  .prompts{display:grid;gap:10px;}
+  .prompt{text-align:left;font-size:14px;color:var(--cream);border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(246,238,223,.02);transition:all .2s;}
+  .prompt:hover{border-color:rgba(235,172,104,.4);}.prompt.on{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
+  textarea{width:100%;margin-top:13px;min-height:124px;resize:vertical;border-radius:15px;background:rgba(18,13,8,.5);border:1px solid var(--line-2);color:var(--cream);font-family:var(--body);font-size:14px;line-height:1.6;padding:15px;}
+  textarea:focus{outline:2px solid rgba(235,172,104,.5);border-color:transparent;}
+  .tracker{display:flex;gap:9px;align-items:flex-end;height:128px;margin-top:12px;}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;height:100%;justify-content:flex-end;}
+  .bar i{width:100%;max-width:38px;border-radius:9px 9px 4px 4px;background:linear-gradient(180deg,var(--amber-2),var(--amber-deep));opacity:.8;transition:height .7s cubic-bezier(.16,1,.3,1);}
+  .bar.today i{box-shadow:0 0 22px rgba(235,172,104,.6);opacity:1;}
+  .bar small{font-size:10.5px;color:var(--faint);}
+
+  /* courses */
+  .course{border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:border-color .2s;}
+  .course:hover{border-color:rgba(235,172,104,.28);}
+  .chead{padding:20px;}
+  .chead .crow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+  .chead h4{font-family:var(--display);font-weight:450;font-size:18px;letter-spacing:-.01em;}
+  .chead .ct{color:var(--faint);font-size:12px;margin-top:3px;}
+  .chead p{color:var(--muted);font-size:12.5px;line-height:1.6;margin-top:12px;}
+  .tag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:5px 11px;flex:none;}
+  .tag.free{color:var(--sage);border:1px solid rgba(175,198,183,.4);}
+  .tag.plus{color:var(--amber-2);border:1px solid rgba(235,172,104,.4);}
+  .cbody{display:none;border-top:1px solid var(--line);padding:6px 20px 16px;}
+  .course.open .cbody{display:block;animation:rise .35s ease;}
+  details.lesson{border-bottom:1px solid var(--line);}
+  details.lesson:last-child{border-bottom:none;}
+  details.lesson summary{list-style:none;cursor:pointer;padding:14px 2px;font-weight:600;font-size:14px;display:flex;gap:11px;align-items:center;transition:color .2s;}
+  details.lesson summary::-webkit-details-marker{display:none;}
+  details.lesson summary .ln{font-family:var(--display);font-style:italic;color:var(--amber-2);width:22px;flex:none;}
+  details.lesson summary:hover{color:var(--amber-2);}
+  details.lesson[open] summary{color:var(--amber-2);}
+  .lb{padding:2px 2px 18px 32px;color:var(--muted);font-size:13.5px;line-height:1.72;}
+  .lb p{margin-bottom:11px;}.lb p b{color:var(--cream);}
+  .lb .try{background:linear-gradient(150deg,rgba(175,198,183,.10),rgba(175,198,183,.03));border:1px solid rgba(175,198,183,.25);border-radius:13px;padding:12px 14px;color:var(--cream);font-size:13px;}
+  .lb .try b{color:var(--sage);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;display:block;margin-bottom:6px;}
+
+  /* PROFILE */
+  .phead{display:flex;align-items:center;gap:18px;}
+  .phead .avatar{width:70px;height:70px;font-size:22px;box-shadow:0 14px 30px -14px rgba(235,172,104,.7);}
+  .pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;}
+  .pstat{border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center;}
+  .pstat b{font-size:26px;font-family:var(--display);}.pstat small{display:block;color:var(--faint);font-size:12px;margin-top:2px;}
+  .setting{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 2px;border-bottom:1px solid var(--line);}
+  .setting:last-child{border-bottom:none;}
+  .setting b{font-size:14px;}.setting small{display:block;color:var(--faint);font-size:12px;margin-top:2px;}
+  .toggle{width:48px;height:27px;border-radius:999px;background:rgba(246,238,223,.08);border:1px solid var(--line-2);position:relative;flex:none;transition:all .25s;}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--faint);transition:all .25s;}
+  .toggle.on{background:linear-gradient(100deg,var(--amber-2),var(--amber));border-color:transparent;}
+  .toggle.on::after{left:23px;background:#241809;}
+  .linkrow{color:var(--amber-2);font-weight:600;font-size:13px;background:none;border:none;}
+  .plan{border-radius:18px;padding:24px;background:linear-gradient(150deg,rgba(235,172,104,.2),rgba(235,172,104,.05));border:1px solid rgba(235,172,104,.32);margin-bottom:16px;box-shadow:0 30px 70px -44px rgba(235,172,104,.6);}
+  .plan h3{font-family:var(--display);font-size:20px;}.plan p{color:var(--muted);font-size:13.5px;margin-top:7px;line-height:1.55;}
+  footer{margin-top:34px;color:var(--faint);font-size:12px;line-height:1.7;border-top:1px solid var(--line);padding-top:20px;}
+  footer b{color:var(--muted);}
+
+  /* ADMIN */
+  .astat{border:1px solid var(--line);border-radius:16px;padding:20px;transition:all .2s;}
+  .astat:hover{border-color:rgba(235,172,104,.3);}
+  .astat .top{display:flex;justify-content:space-between;align-items:center;}
+  .astat .ic{width:36px;height:36px;border-radius:11px;background:rgba(235,172,104,.16);display:grid;place-items:center;}
+  .astat .ic svg{width:16px;height:16px;stroke:var(--amber-2);fill:none;stroke-width:1.8;}
+  .astat .delta{font-size:12px;color:var(--sage);font-weight:600;}
+  .astat b{font-size:28px;font-family:var(--display);display:block;margin-top:14px;}
+  .astat small{color:var(--faint);font-size:12px;}
+  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--sheen);}
+  th{text-align:left;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:14px 17px;border-bottom:1px solid var(--line);}
+  td{padding:15px 17px;border-bottom:1px solid var(--line);font-size:13.5px;}
+  tr:last-child td{border-bottom:none;}
+  .srch{width:100%;background:rgba(18,13,8,.5);border:1px solid var(--line-2);border-radius:13px;color:var(--cream);font-family:var(--body);font-size:14px;padding:13px 16px;margin-bottom:16px;}
+
+  @media(max-width:760px){
+    aside{display:none;}
+    .content{padding:22px 18px 96px;}
+    .topbar{padding:15px 18px;}
+    .hero{padding:34px 24px;}.hero h1{font-size:34px;}.hero .chair{width:84px;opacity:.4;}
+    h1{font-size:30px;}
+    nav.mobile{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:40;display:flex;gap:5px;
+      background:rgba(28,22,16,.95);border:1px solid var(--line-2);border-radius:999px;padding:7px;backdrop-filter:blur(14px);box-shadow:0 18px 44px -14px rgba(0,0,0,.8);}
+    nav.mobile button{background:transparent;border:none;color:var(--muted);padding:11px;border-radius:999px;transition:all .2s;}
+    nav.mobile button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+    nav.mobile button.active{background:linear-gradient(100deg,var(--amber-2),var(--amber));color:#241809;}
+  }
+  @media(min-width:761px){nav.mobile{display:none;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  /* colourful action cards */
+  .act{--ac:#F4B45E;}
+  .act .ic{background:color-mix(in srgb,var(--ac) 22%,transparent)!important;}
+  .act .ic svg{stroke:var(--ac)!important;}
+  .act:hover{border-color:color-mix(in srgb,var(--ac) 52%,transparent)!important;box-shadow:0 26px 52px -30px color-mix(in srgb,var(--ac) 65%,transparent)!important;}
+  /* audio equalizer */
+  .eq{display:none;align-items:flex-end;gap:3px;height:18px;flex:none;}
+  .sound.playing .eq{display:flex;}
+  .eq i{width:3px;border-radius:2px;transform-origin:bottom;
+    background:linear-gradient(180deg,var(--amber-2),var(--amber));animation:eqbar .85s ease-in-out infinite;}
+  .eq i:nth-child(1){height:42%;animation-delay:0s}
+  .eq i:nth-child(2){height:84%;animation-delay:.18s}
+  .eq i:nth-child(3){height:58%;animation-delay:.36s}
+  .eq i:nth-child(4){height:96%;animation-delay:.1s}
+  @keyframes eqbar{0%,100%{transform:scaleY(.32)}50%{transform:scaleY(1)}}
+
+  /* pricing plans */
+  .plans{display:grid;gap:14px;margin:14px 0 10px;}
+  @media(min-width:780px){.plans{grid-template-columns:repeat(3,1fr);align-items:stretch;}}
+  .plancard{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:18px;padding:24px;
+    background:var(--surface);box-shadow:var(--sheen),0 20px 50px -34px rgba(0,0,0,.9);}
+  .plancard.featured{border-color:rgba(244,180,94,.55);
+    background:linear-gradient(160deg,rgba(244,180,94,.16),rgba(244,180,94,.03)),var(--surface);
+    box-shadow:0 30px 70px -38px rgba(244,180,94,.7);}
+  .plancard .pname{font-family:var(--display);font-size:20px;letter-spacing:-.01em;}
+  .plancard .price{font-family:var(--display);font-size:32px;margin-top:8px;letter-spacing:-.02em;}
+  .plancard .price small{font-size:13px;color:var(--faint);font-family:var(--body);}
+  .plancard .plan-note{font-size:12.5px;color:var(--faint);margin-top:6px;}
+  .plancard ul{list-style:none;margin:16px 0 20px;display:flex;flex-direction:column;gap:10px;}
+  .plancard li{font-size:13px;color:var(--muted);line-height:1.45;display:flex;gap:9px;align-items:flex-start;}
+  .plancard li::before{content:"\2713";color:var(--amber-2);font-weight:800;flex:none;}
+  .plancard.featured li::before{color:var(--amber);}
+  .plancard .pbtn{margin-top:auto;width:100%;justify-content:center;}
+  .most{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;
+    background:linear-gradient(100deg,var(--amber-2),var(--amber));color:#241809;font-size:10px;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:999px;box-shadow:0 8px 20px -8px rgba(244,180,94,.8);}
+
+  /* whatsapp banner + socials */
+  .wa-banner{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
+    border:1px solid rgba(75,200,120,.4);border-radius:18px;padding:22px 24px;margin-top:24px;
+    background:linear-gradient(150deg,rgba(75,200,120,.16),rgba(75,200,120,.04));}
+  .wa-banner h2{letter-spacing:-.01em;}
+  .wa-btn{background:linear-gradient(100deg,#37D97E,#1FB562)!important;color:#06310f!important;
+    box-shadow:0 12px 30px -12px rgba(55,217,126,.8)!important;}
+  .socials{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+  .soc{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--cream);
+    background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:9px 16px;transition:all .2s;}
+  .soc:hover{border-color:rgba(244,180,94,.5);transform:translateY(-2px);}
+  .soc .sx{font-size:14px;width:18px;text-align:center;}
+
+</style>
+</head>
+<body>
+
+<!-- ===== GATE ===== -->
+<div id="gate" class="hidden" style="position:fixed;inset:0;z-index:100;background:rgba(13,10,7,.9);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:min(400px,94vw);background:linear-gradient(165deg,#2b2115,#1d1710);border:1px solid rgba(230,167,101,.25);border-radius:24px;padding:32px 28px;text-align:center;">
+    <svg class="mark" viewBox="0 0 150 160" style="width:48px;height:53px;margin:0 auto 12px;display:block;">
+      <rect x="40" y="14" width="70" height="78" rx="16"/><rect x="20" y="56" width="26" height="66" rx="13"/>
+      <rect x="104" y="56" width="26" height="66" rx="13"/><rect x="40" y="86" width="70" height="40" rx="12"/>
+      <line x1="34" y1="126" x2="30" y2="150"/><line x1="116" y1="126" x2="120" y2="150"/></svg>
+    <h2 style="font-family:var(--display);font-weight:420;font-size:23px;">The Open Chair</h2>
+    <div style="font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--amber);margin-top:6px;">Beyond Silence</div>
+    <p style="margin-top:14px;color:var(--muted);font-size:13.5px;line-height:1.6;">Sign in to see your name across the app and keep your check-ins together — or keep browsing anonymously. Your choice, always.</p>
+    <input id="gn" placeholder="What should we call you? (optional)" style="width:100%;margin-top:18px;background:var(--card-2);border:1px solid var(--line);border-radius:12px;color:var(--cream);font-family:var(--body);font-size:14px;padding:13px 15px;">
+    <button class="btn" id="enterBtn" style="width:100%;margin-top:12px;justify-content:center;padding:13px;">Sign in</button>
+    <button id="anonBtn" style="margin-top:10px;background:none;border:none;color:var(--faint);font-size:12.5px;text-decoration:underline;">Continue without signing in</button>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+      <button id="gateSos" style="background:none;border:none;color:var(--rose);font-size:12.5px;font-weight:600;">In crisis right now? Get help →</button>
+    </div>
+    <small style="display:block;margin-top:14px;font-size:11px;color:var(--faint);line-height:1.6;">A working preview with sample data — no real accounts, bookings, or payments. The Open Chair offers peer support, not therapy, and is not an emergency service.</small>
+  </div>
+</div>
+
+<!-- ===== ADMIN PASSCODE (owner only) ===== -->
+<div id="adminGate" class="hidden" style="position:fixed;inset:0;z-index:100;background:rgba(13,10,7,.9);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:min(380px,94vw);background:linear-gradient(165deg,#2b2115,#1d1710);border:1px solid rgba(244,180,94,.3);border-radius:24px;padding:30px 28px;text-align:center;">
+    <div style="width:46px;height:46px;border-radius:14px;margin:0 auto 12px;display:grid;place-items:center;background:rgba(244,180,94,.16);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F4B45E" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h2 style="font-family:var(--display);font-weight:420;font-size:21px;">Admin access</h2>
+    <p style="margin-top:10px;color:var(--muted);font-size:13px;line-height:1.6;">The dashboard is for the owner only. Enter your passcode to manage Listeners, professionals, and Circles.</p>
+    <input id="adminPass" type="password" placeholder="Owner passcode" style="width:100%;margin-top:16px;background:var(--card-2);border:1px solid var(--line-2);border-radius:12px;color:var(--cream);font-family:var(--body);font-size:15px;letter-spacing:.2em;text-align:center;padding:13px 15px;">
+    <div id="adminErr" style="color:var(--rose);font-size:12px;margin-top:8px;min-height:14px;"></div>
+    <button class="btn" id="adminEnter" style="width:100%;justify-content:center;padding:12px;margin-top:6px;">Unlock dashboard</button>
+    <button id="adminCancel" style="margin-top:10px;background:none;border:none;color:var(--faint);font-size:12.5px;text-decoration:underline;">Cancel</button>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" class="layout">
+  <aside>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 150 160"><rect x="40" y="14" width="70" height="78" rx="16"/><rect x="20" y="56" width="26" height="66" rx="13"/><rect x="104" y="56" width="26" height="66" rx="13"/><rect x="40" y="86" width="70" height="40" rx="12"/><line x1="34" y1="126" x2="30" y2="150"/><line x1="116" y1="126" x2="120" y2="150"/></svg>
+      <div><b>The Open Chair</b><small>Beyond Silence</small></div>
+    </div>
+    <nav class="side" id="sidenav">
+      <button data-nav="home" class="active"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V21h14V9.5"/></svg>Home</button>
+      <button data-nav="explore"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Explore</button>
+      <button data-nav="connect"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 1 0-3.1 6.3L21 19l-.7-2.8A8 8 0 0 0 21 12z"/></svg>Connect</button>
+      <button data-nav="tools"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Tools</button>
+      <button data-nav="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7v1"/></svg>Profile</button>
+    </nav>
+    <div class="crisis">
+      <b>● Crisis line</b>
+      <a href="tel:14416">Tele-MANAS: 14416</a>
+      <small>Free · 24×7 · Govt. of India</small>
+    </div>
+    <button class="adminlink" id="adminBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg> Admin dashboard</button>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <h2 id="pageTitle">Home</h2>
+      <button class="tb-btn" id="signInBtn">Sign in</button>
+      <button class="tb-btn tb-plus" data-toast="We will connect this to WhatsApp shortly.">Chat on WhatsApp</button>
+    </div>
+    <div class="content" id="content"><!-- views injected --></div>
+  </main>
+
+  <nav class="mobile" id="mobilenav">
+    <button data-nav="home" class="active"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V21h14V9.5"/></svg></button>
+    <button data-nav="explore"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+    <button data-nav="connect"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 1 0-3.1 6.3L21 19l-.7-2.8A8 8 0 0 0 21 12z"/></svg></button>
+    <button data-nav="tools"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1"/></svg></button>
+    <button data-nav="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7v1"/></svg></button>
+  </nav>
+</div>
+
+<script>
+/* ====================== DATA ====================== */
+const EXPLORE=[
+ {id:`mental`,c:`#F7B22E`,t:`Mental & Emotional Wellbeing`,topics:`Stress, anxiety, sadness, overthinking, emotional exhaustion`,
+  def:`Mental and emotional wellbeing is your ability to feel, think, and cope — how you handle stress, relate to others, and recover from hard days.`,
+  hope:`Struggling here does not mean you are broken. Minds get tired the way bodies do, and like bodies, they heal with rest, care, and support.`,
+  areas:[[`Anxiety`,`Understanding worry, fear, and nervous tension.`],[`Stress`,`Recognising triggers and building healthier coping.`],[`Low mood`,`Moving through periods of heaviness and low energy.`],[`Overthinking`,`Easing the loop of rumination.`],[`Emotional exhaustion`,`Recovering when feeling runs dry.`]],
+  deep:[[`Anxiety`,`Anxiety is your mind trying to protect you from something it senses as a threat, even when there is no real danger in front of you. It shows up as a racing heart, restless thoughts, a tight chest, or a constant sense of unease. It is one of the most common human experiences, and it usually eases when you slow your breathing and gently name what you are actually worried about.`],
+        [`Low mood and sadness`,`Low mood is more than a bad day. It is a heaviness that quietly drains your energy, your motivation, and your interest in things you normally enjoy. Gentle movement, rest, sunlight, and talking to someone often help it lift, but if it lingers for weeks or stops you functioning, that is a sign to reach out for proper support.`],
+        [`Overthinking`,`Overthinking is when your mind loops over the same worry again and again without ever reaching an answer. It feels productive, but it rarely is. Writing the thought down, or saying it out loud to someone, almost always untangles it faster than thinking harder ever will.`],
+        [`Emotional exhaustion`,`Emotional exhaustion is the feeling of being completely used up, when caring, coping, or even small everyday tasks feel like far too much. It is a signal that you have been running on empty for too long. The way back is rest, kindness, and support, not pushing yourself harder.`]]},
+ {id:`family`,c:`#C173F0`,t:`Family & Relationships`,topics:`Parents, marriage, breakup, communication, loneliness`,
+  def:`This is the space for everything between you and the people closest to you — love, conflict, expectations, distance, and the ache when relationships change.`,
+  hope:`Every family and relationship has friction; needing help with it is normal, not failure. Learning to be heard, and to listen, can soften even old wounds.`,
+  areas:[[`Marriage & partnership`,`Communication, intimacy, conflict, reconnection.`],[`Breakup & heartbreak`,`Processing loss and rebuilding after separation.`],[`Family expectations`,`Navigating parents, duty, and pressure.`],[`Loneliness`,`Understanding the pain of disconnection.`]],
+  deep:[[`Marriage and partnership`,`Most relationship strain comes down to how two people communicate when they are hurt. Criticism, blame, and shutting down quietly erode closeness, while honest requests, appreciation, and listening rebuild it. Conflict itself is not the problem; it is normal. How you repair afterwards is what matters most.`],
+        [`Breakup and heartbreak`,`The end of a relationship is a real loss, and your mind and body grieve it like one. The pain is not a sign of weakness or that something is wrong with you; it is proof that the bond mattered. Healing is rarely a straight line, and it comes faster when you let yourself feel it rather than rush past it.`],
+        [`Family expectations`,`Family can be both your deepest source of love and your heaviest source of pressure, especially around marriage, career, and life choices. Two things can be true at once: they may love you sincerely, and the pressure can still be hurting you. You are allowed to honour your family and still live your own life.`],
+        [`Loneliness`,`Loneliness is not about being physically alone; it is about feeling unseen. You can feel it in a crowded room or a full house. It eases not through more contacts, but through a little more genuine connection with even one person who truly listens.`]]},
+ {id:`career`,c:`#36CCA0`,t:`Career & Purpose`,topics:`Job stress, burnout, confidence, career confusion`,
+  def:`Career and purpose covers your working life — pressure to perform, fear of falling behind, burnout, and the deeper question of what your work means to you.`,
+  hope:`Feeling lost in your career often means you are growing out of an old version of yourself, not failing. Careers are long; one hard chapter is not the whole story.`,
+  areas:[[`Burnout`,`Recognising, recovering from, and preventing exhaustion.`],[`Job stress`,`Managing pressure, deadlines, and difficult dynamics.`],[`Career confusion`,`Navigating uncertainty about direction.`],[`Confidence at work`,`Easing self-doubt and impostor feelings.`]],
+  deep:[[`Burnout`,`Burnout is not simply being tired; it is a deep exhaustion, a growing cynicism about work you once cared about, and a sense that nothing you do matters. It usually comes from a long mismatch between you and your job, not from any weakness in you. Rest helps, but lasting recovery means changing what drained you in the first place.`],
+        [`Job stress`,`Some pressure at work is normal and even useful. It becomes harmful when it never switches off, following you home and into your sleep. Small boundaries, a clear end to the workday, and honest conversations about workload protect you more than simply working harder.`],
+        [`Career confusion`,`Not knowing what you want next is uncomfortable, but it is rarely a sign of failure. More often it means you are outgrowing an old path and a new one has not formed yet. Clarity tends to come from trying things and reflecting, not from waiting to feel certain.`],
+        [`Confidence at work`,`Self-doubt and the feeling of being a fraud are extremely common, especially among people who care about doing well. The fix is not waiting to feel confident before you act, but acting anyway and letting evidence of your capability slowly build. Uncertainty is a sign of growth, not proof you do not belong.`]]},
+ {id:`finance`,c:`#FF6B86`,t:`Finance & Stability`,topics:`Money anxiety, debt stress, lifestyle pressure`,
+  def:`Money worries are emotional, not just mathematical — anxiety about bills, debt, comparison, and the pressure to keep up can weigh on everything else.`,
+  hope:`Money stress is one of the most common human experiences — you are far from alone, and small, honest steps genuinely change the picture.`,
+  areas:[[`Money anxiety`,`Easing fear, shame, and worry around finances.`],[`Debt stress`,`Coping with the emotional weight of debt.`],[`Lifestyle pressure`,`Navigating comparison and the urge to keep up.`]],
+  deep:[[`Money anxiety`,`Money worry is rarely just about numbers; it is tangled up with safety, self-worth, and how money felt in your home growing up. The not-knowing is often worse than the reality, so the calmest first step is simply to look honestly at where you stand, without judging yourself for it.`],
+        [`Debt stress`,`Debt carries a heavy sense of shame in many families, but debt is a situation, not a verdict on your character. Keeping it secret is what makes it heavier. Naming it, making a simple plan, and talking to someone are the first real steps out, and missed payments are far better faced early than hidden.`],
+        [`Lifestyle pressure`,`Social media and those around us show everyone's purchases and none of their loans or worries. That constant comparison quietly fuels spending and anxiety. Deciding what genuinely matters to you, and spending there while letting go of the rest, brings far more peace than keeping up ever will.`]]},
+ {id:`physical`,c:`#3FB4F2`,t:`Physical Wellbeing`,topics:`Sleep, exercise, fatigue, body image`,
+  def:`Mind and body are one system. Sleep, movement, food, and how you feel about your body all shape your mood, energy, and resilience.`,
+  hope:`You do not need a perfect routine — one better night of sleep or one short walk genuinely counts. Small kindnesses to your body add up.`,
+  areas:[[`Sleep`,`Understanding sleep and improving its quality.`],[`Movement`,`Using activity to support mood and energy.`],[`Fatigue & energy`,`Addressing tiredness and restoring vitality.`],[`Body image`,`Building a kinder relationship with your body.`]],
+  deep:[[`Sleep`,`Sleep is when your brain and body repair themselves, and poor sleep affects your mood, focus, and patience the very next day. Simple habits help most: a consistent sleep and wake time, a cool dark room, screens off before bed, and easing off caffeine in the afternoon. Protecting sleep is one of the kindest things you can do for your mind.`],
+        [`Movement`,`Movement is one of the most reliable ways to lift mood and steady the mind, and it does not require a gym or a hard workout. A short walk, a stretch, or dancing in your room genuinely counts. What matters is gentle regularity, not intensity.`],
+        [`Fatigue and energy`,`Constant tiredness that rest does not fix is often emotional as much as physical, a sign of carrying too much for too long. It is worth being gentle with yourself, looking at sleep and stress, and, if it persists, checking in with a doctor to rule out physical causes.`],
+        [`Body image`,`How you feel about your body affects how you feel about yourself, and it is one of the most common quiet struggles, especially for young people. Treating your body with the same kindness you would offer a friend, rather than harsh criticism, supports both how you look and how you feel.`]]},
+ {id:`growth`,c:`#FF9A4D`,t:`Personal Growth`,topics:`Self-worth, discipline, confidence, habits, identity`,
+  def:`Personal growth is the slow, brave work of becoming yourself — rebuilding confidence, keeping promises to yourself, and updating who you believe you are.`,
+  hope:`Growth is rarely loud. Every time you show up for yourself in a small way, you are rebuilding trust with the most important person in your life: you.`,
+  areas:[[`Self-worth`,`Building value that is not conditional on performance.`],[`Confidence`,`Developing confidence through action.`],[`Habits & discipline`,`Routines that align with your goals.`],[`Resilience`,`Recovering and growing through difficulty.`]],
+  deep:[[`Self-worth`,`Self-worth becomes fragile when it depends on results, since any failure can shake it. Real, steady self-worth is the quiet sense that you matter simply because you are a person, not because of what you achieve. It is rebuilt slowly, by treating yourself with the same kindness you would give someone you love.`],
+        [`Confidence`,`Confidence is not a feeling you wait to arrive before acting; it is built by acting and seeing yourself cope. Every small thing you follow through on becomes evidence that you can be trusted. Confidence follows action far more often than it precedes it.`],
+        [`Habits and discipline`,`Lasting change comes from small, repeated actions, not bursts of motivation. The easiest habits to keep are the ones tied to who you want to become, and the ones made simple enough to do on a bad day. Be patient; consistency matters more than size.`],
+        [`Resilience`,`Resilience is not being unbreakable; it is the ability to feel difficulty and slowly return to steadiness. It grows through support, self-kindness, and time, and many people find that they come through hard seasons with more depth and clarity than before.`]]},
+ {id:`grief`,c:`#7E9CFF`,t:`Grief & Loss`,topics:`Death, separation, emotional loss, major life changes`,
+  def:`Grief is the natural response to losing someone or something that mattered — a person, a relationship, a home, or a version of your life you expected to live.`,
+  hope:`Grief is not a problem to fix; it is love looking for somewhere to go. There is no deadline and no right way — here, you can carry it at your own pace.`,
+  areas:[[`Bereavement`,`Processing the death of a loved one.`],[`Relationship loss`,`Grieving the end of a significant relationship.`],[`Life transitions`,`Loss of identity or role through change.`],[`When grief feels stuck`,`When loss becomes overwhelming or prolonged.`]],
+  deep:[[`Bereavement`,`Losing someone you love is one of the hardest human experiences, and grief can come in waves of sadness, anger, numbness, or guilt, often without warning. There is no right way and no fixed timeline. Grief is not about forgetting; it is about slowly learning to carry the loss alongside a life that continues.`],
+        [`Relationship loss`,`The end of a relationship, a friendship, or a marriage is a genuine grief, even when no one has died. You are mourning a shared future as well as a person. Allowing yourself to grieve it honestly, rather than minimising it, is what allows healing to begin.`],
+        [`Life transitions`,`Big changes — moving, a job ending, children leaving, a diagnosis — can bring a quiet grief for the life or identity you are leaving behind, even when the change is positive. Naming that loss, instead of pushing it aside, helps you move through it more gently.`],
+        [`When grief feels stuck`,`Sometimes grief stops moving and becomes overwhelming or frozen for a long time, making daily life hard to manage. That does not mean you are grieving wrongly; it means the weight is too heavy to carry alone. This is exactly when talking to a professional can help most.`]]},
+ {id:`student`,c:`#46D98C`,t:`Student & Young Adult Support`,topics:`Academic pressure, exams, identity, friendships, family expectations`,
+  def:`The years of exams, first jobs, friendships, and family expectations can be some of the most pressured of life — while everyone insists they are the best ones.`,
+  hope:`You do not have to have it all figured out — nobody actually does at your age, whatever their posts suggest. Your pace is allowed to be your own.`,
+  areas:[[`Academic pressure`,`Exam stress, performance anxiety, study burnout.`],[`Identity`,`Exploring who you are beyond expectations.`],[`Friendships`,`Belonging, peer relationships, social anxiety.`],[`Future anxiety`,`Uncertainty about career and direction.`]],
+  deep:[[`Academic pressure`,`Exams and the fear of falling behind can feel like your entire worth is on the line, especially when family hopes ride on the results. Your value is not your marks. A broader view of success — one that includes your wellbeing and not just your grades — protects both your mind and, often, your performance.`],
+        [`Identity`,`Your late teens and twenties are a time of figuring out who you are, separate from what others expect of you. Feeling uncertain or in-between is completely normal for this stage, not a sign that you are behind. You are allowed to change your mind and find your own way.`],
+        [`Friendships`,`Friendships and a sense of belonging matter enormously at this age, and feeling left out or socially anxious is far more common than it looks from the outside. Most people are quietly worrying about the same things. One or two genuine connections matter more than being liked by everyone.`],
+        [`Future anxiety`,`Worrying about career, money, and the future is natural when so much feels uncertain. You do not need the whole path mapped out; you only need the next honest step. Almost no one your age truly has it figured out, however confident they may appear online.`]]}
+];
+
+const LISTENERS=[
+ {n:'Priya M.',col:'#E0A458',on:'Online',rt:'4.9',ses:'312',wait:'< 5 min',d:'A warm, non-judgmental listener who believes every person deserves to be heard without conditions.',tags:['Anxiety','Loneliness','Work stress'],lang:'English, Hindi'},
+ {n:'Arjun K.',col:'#B79CD8',on:'Online',rt:'4.8',ses:'198',wait:'< 10 min',d:'Brings lived experience and deep empathy to every conversation, having navigated his own difficult seasons.',tags:['Career pressure','Family conflict','Grief'],lang:'English, Tamil, Hindi'},
+ {n:'Meera S.',col:'#9CCDB9',on:'Away',rt:'5.0',ses:'445',wait:'~ 15 min',d:'Creates a safe, judgment-free space where you can say what you have never been able to say out loud.',tags:['Relationships','Self-worth','Student support'],lang:'English, Malayalam, Hindi'},
+ {n:'Rohan D.',col:'#8FB6C9',on:'Online',rt:'4.7',ses:'156',wait:'< 8 min',d:'Trained in active listening and emotional first-aid. Here to help you hold whatever you are carrying.',tags:['Anger','Financial stress','Identity'],lang:'English, Marathi, Hindi'},
+ {n:'Sana R.',col:'#D98E7E',on:'Online',rt:'4.9',ses:'274',wait:'< 6 min',d:'Calm, patient, and steady. Believes the bravest thing a person can do is reach out.',tags:['Anxiety','Sleep','Overthinking'],lang:'English, Hindi, Urdu'},
+ {n:'Karthik V.',col:'#A6BCAC',on:'Away',rt:'4.8',ses:'189',wait:'~ 20 min',d:'A gentle presence for hard days. No advice unless you want it — just someone who will truly listen.',tags:['Loneliness','Burnout','Change'],lang:'English, Telugu, Hindi'}
+];
+
+const PROS=[
+ {n:'Dr. Ananya R.',col:'#E0A458',role:'Clinical Psychologist',rt:'4.9',exp:'11 yrs',d:'Specialises in CBT and trauma-informed care. Warm, structured, and evidence-based.',tags:['Anxiety','Depression','Trauma'],next:'Today, 4:00 PM',fee:'₹1,200'},
+ {n:'Dr. Vikram N.',col:'#B79CD8',role:'Psychiatrist',rt:'4.8',exp:'15 yrs',d:'Combines medication management with psychoeducation. Compassionate and thorough.',tags:['Mood','OCD','Sleep'],next:'Tomorrow, 10:00 AM',fee:'₹1,800'},
+ {n:'Sunita K.',col:'#9CCDB9',role:'Counsellor & Coach',rt:'4.9',exp:'8 yrs',d:'Integrative approach combining person-centred counselling with practical coaching tools.',tags:['Relationships','Career','Self-esteem'],next:'Mon, 2:00 PM',fee:'₹900'},
+ {n:'Rahul M.',col:'#8FB6C9',role:'Life Coach',rt:'4.7',exp:'6 yrs',d:'Certified coach who helps people reconnect with clarity, energy, and direction after burnout.',tags:['Burnout','Purpose','Confidence'],next:'Today, 6:30 PM',fee:'₹800'}
+];
+
+const CIRCLES=[
+ {t:'Stress & Anxiety Circle',col:'#8FB6C9',st:'Open',mem:24,when:'Tuesdays, 7:00 PM',d:'A safe weekly group for those navigating anxiety and daily stress. Share, listen, find solidarity.',tags:['Work anxiety','Panic','Overthinking'],fac:'Priya M.'},
+ {t:'Family Conflict Circle',col:'#E0A458',st:'Open',mem:18,when:'Thursdays, 8:00 PM',d:'For those navigating difficult family dynamics — parents, partners, siblings. Be understood without judgment.',tags:['Parent conflict','Marriage stress','Expectations'],fac:'Arjun K.'},
+ {t:'Career Pressure Circle',col:'#B79CD8',st:'Open',mem:31,when:'Wednesdays, 7:30 PM',d:'For people facing burnout, career confusion, or workplace stress. Reconnect with your purpose alongside others.',tags:['Burnout','Job loss','Impostor feelings'],fac:'Meera S.'},
+ {t:'Loneliness & Connection Circle',col:'#9CCDB9',st:'Open',mem:15,when:'Saturdays, 6:00 PM',d:'For those who feel disconnected or unseen. A warm, intimate group focused on genuine human connection.',tags:['Social isolation','Moving cities','New beginnings'],fac:'Rohan D.'},
+ {t:'Healing After Loss Circle',col:'#D98E7E',st:'Full',mem:12,when:'Sundays, 5:00 PM',d:'A gentle, supported space for those grieving — a loved one, a relationship, or a version of yourself.',tags:['Bereavement','Breakup grief','Life transitions'],fac:'Sana R.'},
+ {t:'Student Support Circle',col:'#A6BCAC',st:'Open',mem:28,when:'Fridays, 7:00 PM',d:'For students and young adults navigating exams, family expectations, and the pressure to have it figured out.',tags:['Exam stress','Identity','Peer pressure'],fac:'Karthik V.'}
+];
+
+const HELPLINES=[
+ {n:'Tele-MANAS',d:'National Mental Health Helpline — Ministry of Health & Family Welfare, Government of India. Free, 24×7, multilingual.',calls:[['14416','tel:14416'],['1800-89-14416','tel:18008914416']]},
+ {n:'iCall (TISS)',d:'Psychosocial helpline by TISS. Counselling and referral services for mental health concerns.',calls:[['9152987821','tel:9152987821']]},
+ {n:'Vandrevala Foundation',d:'24×7 mental health helpline. Free, confidential support in multiple languages.',calls:[['1860-2662-345','tel:18602662345'],['1800-2333-330','tel:18002333330']]},
+ {n:'AASRA',d:'Crisis intervention and suicide prevention helpline. Available 24 hours.',calls:[['9820466726','tel:9820466726']]}
+];
+
+const AUDIO=[
+ {g:'Ambient soundscapes',items:[
+  {id:'evening',n:'Evening Calm',s:'A warm, slow drift to unwind to',type:'chord',f:[[196,.05],[246.9,.04],[293.7,.03],[392,.015]]},
+  {id:'focus',n:'Quiet Focus',s:'A soft, steady backdrop',type:'chord',f:[[220,.05],[277.2,.035],[329.6,.025]]},
+  {id:'sky',n:'Open Sky',s:'Wide, airy and slow',type:'chord',f:[[174.6,.045],[261.6,.03],[349.2,.02],[440,.01]]},
+  {id:'morning',n:'Morning Light',s:'Bright and gentle',type:'chord',f:[[261.6,.04],[329.6,.03],[392,.025],[523.2,.012]]},
+  {id:'hum',n:'Deep Warmth',s:'Low and grounding',type:'chord',f:[[65.4,.07],[130.8,.04],[196,.018]]},
+  {id:'still',n:'Stillness',s:'Spacious and quiet',type:'chord',f:[[146.8,.05],[220,.03],[293.7,.02]]}
+ ]},
+ {g:'Soft tones',items:[
+  {id:'t1',n:'Warm Drift',s:'A single soft tone to settle with',type:'tone',base:174},
+  {id:'t2',n:'Soft Glow',s:'A gentle sustained tone',type:'tone',base:220},
+  {id:'t3',n:'Slow Tide',s:'A calm, low tone',type:'tone',base:146.8},
+  {id:'t4',n:'Distant Bells',s:'A bright, airy tone',type:'tone',base:329.6},
+  {id:'t5',n:'Low Ember',s:'A deep, restful tone',type:'tone',base:98},
+  {id:'t6',n:'Clear Air',s:'A light, open tone',type:'tone',base:261.6}
+ ]},
+ {g:'Nature & noise',items:[
+  {id:'rain',n:'Soft Rain',s:'Gentle, steady rainfall',type:'noise',tone:1400,q:.6},
+  {id:'ocean',n:'Ocean Slow',s:'Waves rolling in and out',type:'ocean'},
+  {id:'night',n:'Night Air',s:'Low, hushed stillness',type:'noise',tone:520,q:.9},
+  {id:'forest',n:'Forest Hush',s:'Soft, layered calm',type:'noise',tone:900,q:.5},
+  {id:'pulse',n:'Resting Pulse',s:'A slow, settling beat',type:'pulse',base:130.8},
+  {id:'brown',n:'Brown Noise',s:'Deep, even and soft',type:'noise',tone:300,q:.4},
+  {id:'white',n:'White Noise',s:'Steady, masking sound',type:'noise',tone:6000,q:.3},
+  {id:'pink',n:'Pink Noise',s:'Smooth, balanced wash',type:'noise',tone:1800,q:.5}
+ ]}
+];
+
+const BREATH={
+ reset:{t:'2-minute reset',rounds:6,pat:[['Breathe in',4],['Hold',2],['Breathe out',4]],note:'A steady, even rhythm that many people find grounding.'},
+ sleep:{t:'Sleep breathing',rounds:4,pat:[['Breathe in',4],['Hold',7],['Breathe out',8]],note:'A longer exhale that many find calming before sleep. (A pattern popularised by Dr. Andrew Weil.)'},
+ ground:{t:'Anxiety grounding',rounds:5,pat:[['Breathe in',4],['Hold',4],['Breathe out',4],['Hold',4]],note:'An even \u201cbox\u201d rhythm that some people find settling.'},
+ anger:{t:'Anger release',rounds:6,pat:[['Breathe in',4],['Breathe out',6]],note:'A slow, extended exhale that many find soothing when tense.'}
+};
+
+const COURSES=[
+ {t:`Understanding Stress`,tag:`Free`,sub:`5 detailed lessons · the science of stress and how to work with it`,
+  outline:[`What stress actually is`,`Acute vs chronic stress`,`Completing the stress cycle`,`Thoughts that add fuel`,`Building a resilient life`],
+  lessons:[
+   {h:`What stress actually is`,b:[
+     `Stress is not a character flaw or a sign of weakness — it is a precise, ancient survival system doing exactly what it evolved to do. When your brain perceives a demand or threat, the amygdala signals the hypothalamus, which triggers two waves: a fast electrical one through the sympathetic nervous system (adrenaline within seconds — heart rate up, pupils wide, muscles primed) and a slower chemical one through the HPA axis (cortisol over minutes, mobilising glucose and sharpening focus). The physiologist Hans Selye, who coined the modern use of the word "stress" in the 1930s, showed the body runs broadly the same alarm whether the threat is a charging animal, an unpaid bill, or a tense WhatsApp message.`,
+     `The crucial modern problem is duration. Neuroscientist Robert Sapolsky put it memorably in <em>Why Zebras Don\u2019t Get Ulcers</em>: a zebra sprints from a lion, escapes, and within minutes is grazing calmly again — the alarm switches fully off. Humans, uniquely, can keep the alarm running for weeks by thinking: replaying an argument, dreading Monday, rehearsing a worst case at 2 a.m. The stress response was built for short, sharp bursts followed by recovery. Chronic activation is the mismatch that does the damage.`,
+     `It also helps to know that stress is not uniformly bad. Psychologist Kelly McGonigal\u2019s work on "stress mindset" found that people who view a racing heart as their body preparing them to rise to a challenge — rather than as a sign something is wrong — show healthier cardiovascular responses under pressure. The arousal is the same; the meaning you assign to it changes its effect. The goal of this course is therefore not to eliminate stress, which is neither possible nor desirable, but to keep the alarm from running all day, and to recover well between bursts.`,
+     `A simple mental model to carry forward: stress = demand vs perceived resources. Pressure rises when demands feel larger than what you believe you can bring to them. That means there are always two levers — reducing the demand, and increasing (or correctly perceiving) your resources. Most of this course works the second lever, because it is the one most within your control.`],
+    try:`Tonight, catch one single moment your body shifted into stress mode — tight jaw, shallow breath, a clenched stomach. Don\u2019t fix it. Just silently name it: "that\u2019s my alarm." Naming activates the thinking brain and is the first, smallest act of turning the volume down.`},
+   {h:`Acute vs chronic stress — and reading your own signals`,b:[
+     `Acute stress is the clean spike: the moments before a presentation, a near-miss in traffic, a hard phone call. It arrives, peaks, and — if allowed — fades, often leaving you a little more capable next time. This kind of stress is not the enemy; avoiding all of it actually shrinks your tolerance over time.`,
+     `Chronic stress is different and more dangerous precisely because it is quiet. It is the low background hum that never fully switches off — and because it becomes your normal, you stop noticing it. The body, however, keeps the score: disrupted sleep, frequent headaches or stomach trouble, getting ill more often, a shorter fuse with people you love, and a flat numbness where enjoyment used to be. Prolonged cortisol elevation is linked in the research to impaired memory, weakened immunity, and low mood.`,
+     `Clinicians find it useful to sort the warning signs into three channels. In the <b>body</b>: fatigue, muscle tension, jaw clenching, changes in appetite and sleep. In the <b>mind</b>: racing or looping thoughts, difficulty concentrating, constant low-grade worry, irritability. In <b>behaviour</b>: withdrawing from people, procrastinating, and leaning harder on quick regulators like scrolling, food, caffeine, or alcohol. None of these makes you weak; each is simply an alarm that has been left on too long.`,
+     `Your signals are personal, and they tend to fire in a reliable order. One person\u2019s first domino is poor sleep; another\u2019s is snapping at their partner; another\u2019s is a knot in the stomach before email. Knowing your own early dominoes is genuinely protective, because it lets you intervene at the first sign rather than after a collapse — the difference between adjusting your week and needing to rebuild it.`],
+    try:`Write down your three most reliable personal stress signals — the ones that show up first, before the others. Keep the list somewhere you\u2019ll actually see it. Early detection is most of the battle.`},
+   {h:`Completing the stress cycle`,b:[
+     `Here is the single most useful idea in this course, drawn from Emily and Amelia Nagoski\u2019s book <em>Burnout</em>: removing the stressor is not the same as removing the stress. You can end the difficult meeting, file the report, or leave the tense room — but the adrenaline and cortisol your body produced are still circulating. The <b>stressor</b> (the trigger) and the <b>stress</b> (the physiological state) are two separate things, and the second one has to be discharged through the body, not just resolved in the mind.`,
+     `This explains a familiar paradox: you can "rest" all weekend on the sofa and still feel wrung out on Monday, because passive rest never told your body the danger had passed. The body speaks a physical language, and the message "you are safe now" has to be sent in that language. The Nagoskis call this "completing the cycle."`,
+     `The reliable cycle-completers are specific. <b>Physical movement</b> is the most efficient — even ten to twenty minutes of walking, stair-climbing, or dancing badly in your room. <b>Slow breathing</b>, especially a longer exhale than inhale, switches on the parasympathetic "rest and digest" branch. <b>Genuine laughter</b>, a <b>long hug</b> (around twenty seconds with someone you trust), a real <b>cry</b>, and <b>creative expression</b> all work. So does <b>connection</b> — feeling understood by even one person measurably settles the system, which is the entire premise of being heard rather than fixed.`,
+     `The practical upgrade is to attach completion to your existing stress, like a punctuation mark at the end of a sentence. Hard call ends, take a two-minute walk. Stressful commute ends, three slow breaths before you open the door. Over weeks this rewires the expectation that every spike has an exit, which lowers your baseline.`],
+    try:`After your next clearly stressful event, deliberately move your body for ten minutes before doing anything else. Notice the felt difference between distracting yourself from the stress and actually discharging it — they are not the same.`},
+   {h:`The thoughts that pour fuel on the fire`,b:[
+     `A large share of chronic stress is not delivered by events but manufactured by how we interpret them. Cognitive behavioural therapy, built on Aaron Beck\u2019s insight that thoughts drive feelings, identified recurring "thinking traps" that quietly amplify stress. <b>Catastrophising</b>: leaping to the worst imaginable outcome. <b>All-or-nothing thinking</b>: "if it isn\u2019t perfect, I\u2019ve failed." <b>Mind-reading</b>: "they clearly think I\u2019m useless." <b>Overgeneralising</b>: "this always happens to me." Each takes a manageable situation and inflates it.`,
+     `The skill that helps is not forced positivity — telling yourself everything is fine when it isn\u2019t simply doesn\u2019t land. The skill is accuracy. When you catch a hot thought, slow it down and interrogate it like a fair-minded investigator: What is the actual evidence for and against this? What would I say to a friend who told me this thought? What is the most <em>likely</em> outcome, as opposed to the worst possible one? Stress drops when thoughts become more truthful, not more cheerful.`,
+     `A practical structure is the thought record: write the situation, the automatic thought, the feeling it produced (rated 0–100), the evidence on each side, and then a balanced alternative thought — and re-rate the feeling. People are often surprised how much intensity drains out simply by getting the thought onto paper where it can be examined rather than believed.`,
+     `The Stoic philosophers offered the same medicine two thousand years earlier. Epictetus taught that we are disturbed not by events but by our judgments about them, and that peace comes from clearly separating what is in our control (our effort, our response, our attention) from what is not (other people, outcomes, the past). A surprising amount of chronic worry, examined honestly, lives entirely in the second column — and spending energy there is like rowing a boat that isn\u2019t in the water.`],
+    try:`Next time you feel a stress spike, write the exact thought down word for word, then ask one question: is this a <em>fact</em>, or a <em>fear</em>? Rewrite it as the most accurate single sentence you can manage.`},
+   {h:`Building a stress-resilient life`,b:[
+     `Resilience is far less a personality trait than an infrastructure — a set of conditions that, when in place, make the same stressors land more softly. Four pillars carry most of the load, and they are worth protecting in roughly this order. <b>Sleep</b> is first because it is the single most powerful stress regulator we have; almost everything else gets harder on a sleep debt, so a consistent wind-down and wake time beats any clever technique layered on top of exhaustion.`,
+     `<b>Movement</b> is second: regular, moderate, and enjoyable beats intense and occasional, because the version you will actually keep doing is the one that works. <b>Connection</b> is third and routinely underestimated — feeling genuinely heard by even one person buffers stress at a measurable, physiological level, which is precisely why talking to a Listener is not a soft extra but an active tool. <b>Boundaries</b> are fourth: every "yes" is a "no" to something else, and chronic overcommitment is simply a stress tap left running. Saying no is a stress-management skill, not a character defect.`,
+     `On top of the pillars, build one small daily "completion ritual" — a short walk, a few minutes of breathing, journaling, prayer, or music — that reliably tells your body the day is allowed to end. Rituals work because they are repeated and bodily; their power is in the consistency, not the content.`,
+     `Finally, know the line where self-help ends and support begins. Ordinary stress responds to the practices above. But if stress has tipped into persistent hopelessness, panic attacks, an inability to function, or any thoughts of harming yourself, that is no longer a self-help matter, and reaching for professional help is the strong, sensible move — exactly what you\u2019d do for a fracture rather than walking it off. A counsellor or doctor can do for your mind what a physiotherapist does for an injured body. You can reach a Listener here any time, and the helplines on the Connect page are free and available around the clock.`],
+    try:`Choose one pillar — sleep, movement, connection, or boundaries — and make one specific, small improvement this week. Just one. Small is what survives contact with a real life.`}
+ ]},
+ {t:`Rebuilding Self-Worth`,tag:`Plus`,sub:`5 detailed lessons · from a harsh inner critic to a steady inner ally`,
+  outline:[`Where self-worth comes from`,`Self-compassion as the engine`,`Quieting the inner critic`,`Shame, guilt, and being seen`,`Worth as a daily practice`],
+  lessons:[
+   {h:`Where self-worth actually comes from`,b:[
+     `Psychologists draw a line that, once seen, is hard to unsee: the difference between <b>contingent</b> self-worth and <b>unconditional</b> self-worth. Contingent worth says "I matter <em>when</em> I achieve, when I\u2019m chosen, when others approve." Unconditional worth says "I matter because I am a person." Contingent worth is a house you rent from your latest result — and any exam, breakup, layoff, or criticism can evict you overnight. This is why outwardly successful people can feel hollow: their worth is leveraged entirely against performance that can always slip.`,
+     `Most of us absorbed the contingent version early, and not through cruelty but through ordinary conditioning — praise that arrived with marks, love that seemed to brighten with obedience, constant comparison to a cousin or classmate. A child cannot distinguish "this behaviour disappointed me" from "I am disappointing," so the equation "I am worthy only when I perform" gets wired in before we can question it.`,
+     `The inner critic, then, is usually not the voice of truth but an old recording — frequently in a parent\u2019s, teacher\u2019s, or culture\u2019s cadence — still playing decades later on a loop you never chose. This single realisation is the beginning of the repair: the critic is something you <em>learned</em>, which means it is something that can be updated. You are not arguing with reality; you are updating outdated firmware.`,
+     `Rebuilding self-worth is therefore not a project of becoming impressive enough to finally deserve kindness. It is the quieter work of moving your worth off the stock market of other people\u2019s opinions and results, and onto firmer ground that does not crash with every bad day.`],
+    try:`Complete this sentence as honestly as you can: "I feel most worthless when ___." Then ask: whose voice taught me that this makes me worthless? It usually has a name and a face.`},
+   {h:`Self-compassion: the engine of repair`,b:[
+     `The researcher who reshaped this field is Dr. Kristin Neff, whose work defines self-compassion through three components. <b>Self-kindness</b>: speaking to yourself as you would to someone you love, rather than as a drill sergeant. <b>Common humanity</b>: remembering that struggle, failure, and inadequacy are part of the shared human experience, not proof that you are uniquely defective. <b>Mindfulness</b>: holding your pain in balanced awareness — neither suppressing it nor drowning in it.`,
+     `The most common objection is that self-compassion will make you soft, complacent, or self-indulgent. The research consistently finds the opposite. Self-compassionate people take <em>more</em> responsibility for their mistakes (because owning a failure no longer threatens their whole identity), persist longer after setbacks, and report less fear of failure. Self-criticism motivates through threat — it works, briefly, the way a whip works, while quietly raising anxiety and the urge to avoid. Self-compassion motivates through care, which is sustainable. As Neff puts it, you don\u2019t abandon a struggling friend; you encourage them — and you are allowed to be that friend to yourself.`,
+     `There is also a physiological logic. Harsh self-criticism activates the threat system (the same cortisol and defensiveness as an external attack), narrowing your thinking exactly when you need it widest. Warmth and reassurance engage the soothing system associated with safety and connection, which is the state in which people actually learn and change.`,
+     `A reliable entry point is Neff\u2019s own question: "What would I say to a dear friend in this exact situation?" You already possess the full vocabulary of compassion — you use it on others daily. The work is simply to stop excluding one specific person from it: yourself.`],
+    try:`Write yourself a short letter about a current struggle, in the exact tone and words you would use for your closest friend going through the same thing. Read it aloud. Notice the resistance — and write it anyway.`},
+   {h:`Quieting the inner critic`,b:[
+     `You cannot delete the inner critic, and trying tends to make it louder. But you can demote it from "narrator of reality" to "one anxious voice among several." CBT offers a clean three-step method. <b>Notice</b>: catch the critical thought in the act, which itself creates a sliver of distance. <b>Name</b> it: "ah, there\u2019s the never-enough story again." Naming converts you from being the thought into being the person observing the thought — a shift therapists call cognitive defusion. <b>Reframe</b>: rewrite the thought as something both accurate and humane.`,
+     `Some therapists suggest giving the critic an actual persona — a grumpy radio host, an overcautious elderly relative, a tabloid editor. This sounds frivolous but does real work: it reveals what the critic actually is underneath, which is almost always a <em>frightened protector</em>. Its harshness is a clumsy attempt to keep you safe from rejection, disappointment, or failure by getting there first. You can thank it for trying to protect you, and still decline to follow its advice — the way you might thank an overprotective friend while doing the brave thing anyway.`,
+     `Watch one word in particular: "should." The psychologist Clayton Barbeau called the habit "shoulding on yourself," and almost every "should" turns out to be someone else\u2019s rulebook smuggled in as your own. Try swapping "I should" for "I choose to" or "I want to," and notice which sentences instantly stop making sense — those are the borrowed obligations you can quietly put down.`,
+     `None of this is about silencing your standards or pretending you have no flaws. It is about changing the <em>tone</em> in which you address them. The same correction — "that didn\u2019t go well, here\u2019s what I\u2019ll do differently" — can be delivered as contempt or as coaching. Only one of those actually helps you improve, and it isn\u2019t contempt.`],
+    try:`For one full day, simply count your self-critical "shoulds" — keep a tally on your phone. Don\u2019t change anything yet. Awareness alone begins to loosen the grip, because you can\u2019t un-notice a pattern once you\u2019ve seen its size.`},
+   {h:`Shame, guilt, and the courage to be seen`,b:[
+     `The researcher Brené Brown drew a distinction that has freed a great many people: <b>guilt</b> says "I <em>did</em> something bad," while <b>shame</b> says "I <em>am</em> bad." Guilt is about behaviour, and it can be genuinely useful — it points to a gap between our actions and our values and motivates repair. Shame is about identity, and it is corrosive: it isolates, silences, and whispers that if people truly knew you, they would leave.`,
+     `Brown\u2019s central, repeatedly replicated finding is that shame cannot survive being spoken into empathy. It thrives in secrecy, silence, and judgment; it withers when shared with someone who responds with understanding rather than disgust. This is not a poetic flourish — it is a mechanism. When a person voices the thing they are most ashamed of and is met with "me too" or simply "thank you for telling me," the shame loses most of its grip on the spot. It is also the precise reason a non-judgmental space to be heard is not a soft luxury but an active instrument of healing.`,
+     `Vulnerability — letting yourself be genuinely seen, uncertainty and imperfections included — is, in Brown\u2019s research, not weakness but the truest measure of courage. The catch is that you cannot selectively numb: when we deaden shame, fear, and disappointment, we deaden joy, gratitude, and connection along with them, because they run on the same wiring. A life protected from being seen is also a life partly closed to being loved.`,
+     `Practically, shame shrinks in three moves: name it ("this is shame, and it\u2019s telling me I\u2019m unworthy"), reality-test it (is this about something I did, or a story about who I am?), and share it with one safe person. You do not have to broadcast your tenderest material to the world — one trustworthy witness is enough to break the spell.`],
+    try:`Identify one small thing you have never said out loud to anyone. You do not have to share it today. Simply notice, honestly, how much ongoing energy it costs you to keep it hidden — that cost is the tax shame collects.`},
+   {h:`Worth as a daily practice`,b:[
+     `Self-worth is not rebuilt by affirmations alone. The brain is an evidence-weighing organ and quietly discounts claims it has no support for; tell yourself "I am enough" while your behaviour says otherwise and the words bounce off. Worth is rebuilt instead by <b>keeping small promises to yourself</b>. Each kept promise — the ten-minute walk you said you\u2019d take, the early night, the boundary you actually held — is a data point that says "I can be trusted." Self-trust is the load-bearing wall of self-worth, and it is built boringly, brick by brick.`,
+     `Direction matters more than scale. Choose actions aligned with your <em>values</em> (honesty, care, courage, learning) rather than your <em>fears</em> (looking good, never disappointing anyone). Values-based living is the core of Acceptance and Commitment Therapy, developed by Steven Hayes: instead of waiting to feel worthy before acting, you act in line with who you want to be, and the sense of worth follows the behaviour. An identity built on values can absorb failures that an identity built on outcomes cannot.`,
+     `Keep an "evidence journal." Each evening, write one thing you did that you\u2019re quietly glad about, however small — a kindness, a task finished, a hard thing faced, a boundary kept. You are not inflating your ego; you are correcting a lifetime of one-sided bookkeeping in which failures were filed in permanent ink and decencies were waved away. Over weeks, the ledger starts to balance, and the felt sense of yourself shifts with it.`,
+     `Finally, hold the long view with patience. The harsh inner voice took years to install and will not vanish in a week; some days the old recording will play at full volume, and that is not failure or relapse — it is simply the work in progress. The aim is not a permanently silent critic but a louder ally: a steady internal voice that, more and more often, has your back.`],
+    try:`Make one promise to yourself for tomorrow so small it\u2019s almost embarrassing — drink a glass of water on waking, step outside for two minutes. Then keep it. Repeat daily. This is, unglamorously, exactly how self-trust is rebuilt.`}
+ ]},
+ {t:`Managing Family Pressure`,tag:`Plus`,sub:`5 detailed lessons · love, limits, and staying yourself`,
+  outline:[`Why family cuts the deepest`,`Boundaries as bridges`,`Saying hard things well`,`Guilt, obligation, and pressure`,`Acceptance, distance, and peace`],
+  lessons:[
+   {h:`Why family pressure cuts the deepest`,b:[
+     `A stranger\u2019s criticism stings for an afternoon; the same words from a parent can echo for years. The reason is developmental: family shaped your earliest sense of safety, belonging, and identity, so its approval feels wired to survival itself — because, for the small child you once were, it literally was. That old wiring doesn\u2019t simply switch off when you become an adult who pays your own rent.`,
+     `The family therapist Murray Bowen described families not as collections of individuals but as <b>emotional systems</b>, in which anxiety in one member travels through the whole network like current through a circuit. Within that system, each person tends to be cast in a role — the responsible one, the achiever, the peacemaker, the rebel, the "difficult" one — and the system works, often unconsciously, to keep everyone in their assigned part, because predictability feels safe even when it doesn\u2019t feel good.`,
+     `Much of what registers as adult family pressure is really the system trying to hold you in a role you have outgrown. Your growth, however healthy, can feel to the system like a malfunction to be corrected. In cultures where family duty, collective identity, and parental sacrifice run especially deep — as across much of India — this pull is stronger still, because individual choices are read not as personal preferences but as statements about the entire family\u2019s honour and worth.`,
+     `Two things can be true at once, and holding both is the mature starting point: your family can love you sincerely, <em>and</em> the pressure they apply can still be harming you. You do not have to recast them as villains to take your own wellbeing seriously. Most family pain comes not from malice but from people doing what was done to them, with the tools they were given.`],
+    try:`Name the role you were assigned in your family — the achiever, the adjuster, the fixer, the easy one. Then ask: how is that old role still quietly writing my decisions today, long after I outgrew it?`},
+   {h:`Boundaries are bridges, not walls`,b:[
+     `The word "boundary" sounds, especially in close-knit families, like rejection or coldness — a wall thrown up against people who love you. The psychologists Henry Cloud and John Townsend, who wrote the defining work on the subject, reframe it entirely: a boundary is simply the line that marks where you end and another person begins. It communicates "this is what I feel, what I can carry, and what I choose" — not "I don\u2019t love you."`,
+     `A useful diagnostic is the difference between healthy closeness and <b>enmeshment</b>. Healthy closeness means being deeply involved in each other\u2019s lives while remaining two separate people with separate feelings. Enmeshment means the feelings and decisions are so fused that your sadness becomes their emergency, and their disapproval becomes your personal crisis. Love does not require this merger; in fact, the merger slowly suffocates the love, because there is no longer enough space between two people for genuine choice or genuine generosity.`,
+     `Counter-intuitively, boundaries <em>protect</em> relationships rather than threaten them. The hidden tax on every unspoken limit is resentment, and resentment does not stay hidden — it leaks out sideways as coldness, sarcasm, sudden distance, or explosions over something trivial. A clear, kind limit ("I can come for lunch on Sunday, but not every day") keeps the love clean in a way that silent, simmering compliance never can. You are choosing honest connection over resentful proximity.`,
+     `Boundaries are also a skill that improves with use, not a single dramatic confrontation. They can be small and specific: which topics are open, how often you visit, when your phone is off, what you will and won\u2019t discuss. You are not issuing ultimatums; you are teaching the system, repetition by repetition, the actual shape of the adult you have become.`],
+    try:`Find one recurring resentment you feel toward a family member. Behind almost every resentment is a boundary you haven\u2019t spoken. Write down — just for yourself, for now — what that unspoken limit actually is.`},
+   {h:`Saying the hard thing without starting a war`,b:[
+     `<em>How</em> you say a difficult thing matters at least as much as the thing itself. The psychologist Marshall Rosenberg\u2019s Nonviolent Communication offers a four-part structure that reliably lowers the temperature of a hard conversation. <b>Observation</b>: state the specific, factual trigger without judgment ("When the conversation turns to my marriage plans..."). <b>Feeling</b>: name your own emotion ("...I feel pressured and anxious..."). <b>Need</b>: state the need underneath it ("...because I need to make this decision at my own pace..."). <b>Request</b>: make a clear, doable ask ("...so could we set this topic aside for today?").`,
+     `Notice what is deliberately absent from that structure: blame, character attacks, and the words "you always" or "you never." This is the difference between a "you-statement," which puts the other person on trial and triggers defence, and an "I-statement," which discloses your own experience and is far harder to argue with. You are not accusing them of being a bad parent; you are reporting what happens inside you — and no one can credibly dispute your own felt experience.`,
+     `Timing and dosage matter as much as wording. Choose a calm moment, not the heat of an argument or the middle of a family function. Keep it short — over-explaining invites debate and signals that you\u2019re seeking permission. And hold your tone steady even if theirs rises; you cannot control their reaction, only the clarity and steadiness of your own delivery. A boundary delivered calmly and repeated consistently teaches far more than one delivered in a flare of anger and then abandoned.`,
+     `Expect that the first few attempts will feel clumsy and uncomfortable, and that the system may push back harder precisely because the message is landing. Clumsy and consistent beats eloquent and one-off. You are playing a long game of patient repetition, not winning a single debate.`],
+    try:`Take the boundary you identified in the last lesson and draft it in the four-part format: observation, feeling, need, request. Rehearse it once, out loud, when you\u2019re alone. Saying it to the air first makes saying it to a person far less daunting.`},
+   {h:`Guilt, obligation, and emotional pressure`,b:[
+     `The moment you begin holding limits, expect pushback — and it helps to recognise its standard toolkit. The therapist Susan Forward named it <b>FOG</b>: Fear, Obligation, and Guilt. It can sound like "after everything we\u2019ve done for you," arrive as sudden tears or a wounded silence, or surface as health complaints that spike at strategically convenient moments. This is not always conscious manipulation; very often it is the system\u2019s genuine panic at change, expressed through whatever lever has worked before. But it operates on you the same way regardless of intent, so you need a way to meet it without simply caving.`,
+     `The key distinction is between <b>appropriate guilt</b> and <b>misplaced guilt</b>. Guilt is appropriate when you have genuinely violated your own values — been cruel, dishonest, neglectful. It is misplaced when you have merely <em>disappointed someone\u2019s expectations</em> of you. Disappointing people is not the same as wronging them, and it is an unavoidable, survivable part of being an adult with your own life. You can care deeply about another person\u2019s feelings without being obligated to obey them.`,
+     `Bowen called the goal here <b>differentiation of self</b>: the capacity to stay warmly connected to your family while keeping your own thinking, feelings, and choices intact — to be neither cut off nor swallowed up. A differentiated person can sit in the room while a relative is upset with their choice, feel the discomfort, and still not collapse the boundary or detonate the relationship. The internal mantra is "calm and connected": you do not have to choose between being yourself and being family.`,
+     `When the guilt hits hardest, slow it down with one question (below) and remember that feelings are not commands. A wave of guilt is information to be examined, not an order to be followed. You are allowed to feel guilty and hold the line at the same time — and over time, the guilt that isn\u2019t fed by surrender tends to quieten.`],
+    try:`Next time guilt floods in after you\u2019ve held a limit, ask yourself one question before doing anything: "Did I actually break one of my values, or did I just disappoint someone\u2019s expectations?" Only the first genuinely calls for an apology.`},
+   {h:`Acceptance, distance, and protecting your peace`,b:[
+     `Some family dynamics will shift as you change and hold steady; others, honestly, will not. The psychologist Marsha Linehan\u2019s concept of <b>radical acceptance</b> is the tool for the second kind. Accepting reality as it actually is — "my father may never say he is proud of me," "my mother will probably always comment on my weight" — is not approval, and it is not giving up. It is laying down an exhausting, unwinnable war against the facts, which frees the enormous energy you were spending on hoping the unchangeable would change.`,
+     `Acceptance often involves real grief: mourning the parent or family you needed and didn\u2019t get, the relationship you keep hoping will finally materialise. That grief is legitimate and deserves space rather than being rushed past. Paradoxically, only once you stop demanding that they be different can you see clearly what is actually available, and respond to the family you have rather than the one you wish you had.`,
+     `That clarity then lets you choose your <b>distance</b> deliberately rather than reactively. Distance is not punishment and not failure — it is dosage. You might keep full closeness in some areas and limit others; keep certain topics off the table; structure contact so it happens on terms you can sustain; or, in cases of real harm, step back substantially to protect yourself. Many people discover they love their family best from a slightly greater range, where there is enough space to show up generously rather than defensively.`,
+     `And remember what this whole platform exists for: you never have to carry any of this in silence. Saying out loud to a non-judgmental listener, "my family is genuinely loving and it is also crushing me," can be the single most relieving sentence of your year, precisely because the contradiction is so hard to voice to the people inside it. Where the family pain runs deep — especially where there has been abuse, estrangement, or trauma — a professional therapist is the right companion for that road, and there is no prize for walking it alone.`],
+    try:`Write two short lists side by side: "What I keep hoping they\u2019ll change" and "What is actually likely." Pick one item from the first list and practise the sentence: "I accept this is how it is — and I get to choose how I live alongside it."`}
+ ]},
+ {t:`Financial Anxiety Basics`,tag:`Free`,sub:`5 detailed lessons · calm, honest, shame-free steps with money`,
+  outline:[`Money is emotional first`,`Facing the numbers gently`,`A simple plan beats a perfect one`,`Debt without shame`,`Building lasting calm`],
+  lessons:[
+   {h:`Money is emotional before it is mathematical`,b:[
+     `If financial stress were really about arithmetic, a calculator would cure it. It plainly doesn\u2019t — people with healthy bank balances lie awake worrying, and people with very little sometimes carry a striking calm. As the writer Morgan Housel argues in <em>The Psychology of Money</em>, financial decisions are made at kitchen tables and shaped by memory and emotion, not in spreadsheets. How money <em>felt</em> in your childhood home — scarce and tense, or controlled and silent, or chaotic — wrote rules into you long before you understood interest rates.`,
+     `There is also a cruel feedback loop in the research. The economists Sendhil Mullainathan and Eldar Shafir, in <em>Scarcity</em>, showed that worrying about money is not free: it consumes real cognitive bandwidth, measurably reducing the mental capacity available for planning, patience, and good decisions. In plain terms, being stressed about money makes it harder to deal with money. That is not a personal weakness; it is the trap\u2019s design, and naming it removes a layer of self-blame.`,
+     `Psychologist Dr. Brad Klontz studies "money scripts" — the unconscious beliefs about money we absorb young and then act out as adults: "money is the root of all evil," "there will never be enough," "more money will finally make me happy," "talking about money is rude." These scripts run quietly in the background and drive behaviour far more than financial knowledge does, which is why education alone so often fails to change habits.`,
+     `So this course deliberately begins by removing shame rather than adding spreadsheets. Money anxiety is one of the most universal human experiences on earth — you are in enormous company — and the goal here is not wealth, which is slow and partly outside your control. The goal is <em>calm</em>, which is achievable far sooner, and which is itself the precondition for handling money well.`],
+    try:`Finish these two sentences honestly: "In my childhood home, money meant ___," and "My biggest money fear is ___." You are mapping the emotional terrain before you touch a single number.`},
+   {h:`Facing the numbers (gently)`,b:[
+     `Financial anxiety feeds, above all, on vagueness. The not-knowing — the unopened statements, the rough guess at what you owe, the account you avoid checking — generates a free-floating dread that is often worse than any specific reality. And the avoidance is self-reinforcing: not looking brings a few minutes of relief and a few more days of low-grade fear, a loop psychologists know well.`,
+     `The exit is one honest snapshot, taken once, the way a doctor reads a scan — with attention but without moral commentary. Four numbers on one page: what comes in each month, what goes out, what you owe, and what you\u2019ve saved. The single rule is that the inner critic is not invited to this meeting. You are an investigator gathering facts, not a judge passing sentence. Berating yourself for past spending changes nothing about the present and guarantees you\u2019ll avoid the page next time.`,
+     `Almost everyone who does this reports the same surprise: the reality, even when it\u2019s genuinely bad, is less frightening than the fog was. A defined problem is a problem you can begin to solve; an undefined one can only be dreaded. Clarity is the first real deposit into the calm account, and it costs only an hour and some self-kindness.`,
+     `Make it gentle and finite. Do it in one sitting, with a cup of tea, at a time you have a little energy — not at midnight when everything feels catastrophic. If strong feelings come up partway through (and they often do), that is normal; pause, breathe, and come back. The goal of this lesson is not a budget yet. It is simply to <em>look</em>, kindly and completely.`],
+    try:`This week, take the snapshot: income, outgoings, debts, savings — four numbers on one page. When the inner critic shows up (it will), repeat: "Facts first. Feelings respected. Judgment cancelled."`},
+   {h:`A simple plan beats a perfect one`,b:[
+     `Complexity is where good financial intentions quietly go to die. The elaborate spreadsheet you build in a burst of motivation is the one you abandon in week three. So start with something almost insultingly simple. A widely used starting heuristic, popularised by the bankruptcy researcher (and later senator) Elizabeth Warren, is <b>50/30/20</b>: roughly half your income to needs, thirty percent to wants, and twenty percent to savings and debt repayment. The exact ratios are not sacred — on a tight income or in an expensive city they bend hard — but the framework turns formless anxiety into three manageable buckets.`,
+     `The single most anxiety-reducing financial asset is an <b>emergency buffer</b>. Study after study on financial wellbeing finds that even a small cushion — one month of expenses to start, building toward three — dramatically lowers day-to-day money stress, because it converts every nasty surprise from a crisis into a mere inconvenience. A buffer doesn\u2019t just protect your bank balance; it protects your nervous system.`,
+     `<b>Automate</b> whatever you can. A standing instruction that moves a set amount into savings on the day your salary lands means the discipline happens once, at setup, rather than requiring willpower every single day. You are not trying to transform yourself into a more disciplined person by force; you are building rails so that the ordinary, imperfect person you already are succeeds by default. Behavioural science is clear that environment design beats willpower almost every time.`,
+     `Start absurdly small if you need to. An automatic transfer of even a token amount establishes the <em>habit and the rail</em>, which matter more at this stage than the sum. The amount can grow later; the system existing is the win today. Momentum, not magnitude, is what you\u2019re building.`],
+    try:`Set up one automatic transfer — any amount, however small — into a separate savings space on your next salary day. The number matters far less than the rail existing.`},
+   {h:`Debt without shame`,b:[
+     `Debt carries a moral weight in many families and cultures that it simply does not deserve. Debt is a <em>situation</em>, not a verdict on your character — and treating it as a shameful secret is precisely what keeps people from the two things that actually resolve it: a clear plan, and, where needed, an honest conversation. Dr. Brené Brown\u2019s research on shame applies directly here: shame thrives in secrecy and silence, so the act of speaking about debt — to a trusted person, a counsellor, or a financial adviser — is itself the first real step toward addressing it.`,
+     `There are two well-tested repayment strategies, and the "best" one is mostly the one you\u2019ll actually keep doing. The <b>avalanche</b> method pays the minimum on everything while throwing all spare money at the highest-interest debt first; it is mathematically optimal and saves the most money. The <b>snowball</b> method clears the <em>smallest</em> balance first regardless of interest; it is mathematically slightly worse but psychologically powerful, because each fully cleared debt delivers a real win that fuels momentum. If motivation is your bottleneck, the snowball often wins in practice precisely because people stick with it.`,
+     `One firm rule: never skip minimum payments silently. If payments are becoming genuinely impossible, contacting the lender <em>early</em> protects you far better than going quiet and hoping — most lenders have hardship processes, restructuring options, and far more flexibility than fear assumes, but only before things escalate. Avoidance is the enemy here, not the debt itself.`,
+     `Finally, hold the line on proportion. If debt stress has tipped into hopelessness, dread that follows you everywhere, or thoughts of harming yourself, that is a wellbeing emergency first and a financial problem second. Money problems are survivable and solvable; please reach out — to someone you trust, to a Listener here, or to the free helplines on the Connect page — before the weight becomes anything more than financial.`],
+    try:`List every debt with its interest rate on one page. Choose avalanche or snowball — whichever you\u2019ll genuinely sustain — and commit only to <em>this month\u2019s</em> step, not the whole mountain.`},
+   {h:`Building lasting calm with money`,b:[
+     `Once the basics are standing — a snapshot, a simple plan, the start of a buffer — the work turns inward again, because the final boss of money anxiety is rarely arithmetic. It is <b>comparison</b>. Social feeds and family functions broadcast everyone\u2019s purchases and absolutely none of their loans, anxieties, or parental help. Housel\u2019s sharpest observation is that wealth is largely what you <em>don\u2019t</em> see — it is the money quietly not spent — while what you do see, the cars and holidays and renovations, is often debt wearing expensive clothes.`,
+     `A practical antidote is <b>values-based spending</b>. Decide deliberately what genuinely matters to you — travel, family, learning, security, generosity — and spend openly and guiltlessly there, while cutting ruthlessly in the areas you only fund out of habit or comparison. Research by Dr. Tim Kasser consistently links prioritising extrinsic goals (wealth, status, image) over intrinsic ones (relationships, growth, contribution) with <em>lower</em> wellbeing. Much money stress comes not from spending itself but from spending that quietly contradicts your own values.`,
+     `Borrow the late investor John Bogle\u2019s favourite word: <b>enough</b>. Financial calm does not arrive at a particular number — the number tends to recede as you approach it — but at a particular <em>relationship</em>, the point where money becomes a tool you direct rather than a running verdict on your worth. Defining your own "enough," in concrete terms, is one of the most freeing financial acts available, and it costs nothing.`,
+     `And give yourself an honest patience. Calm with money is built the same unglamorous way as calm anywhere else: small honest steps, repeated, with self-kindness for the inevitable bad months. You will overspend sometimes, avoid the page sometimes, and feel the old fear return sometimes. That is not relapse; it is being a person. The trend over months matters far more than any single week.`],
+    try:`Write your own definition of "enough" — not the number, but the life: what would genuinely feel like sufficiency to you? Keep it somewhere you\u2019ll see it before your next big purchase.`}
+ ]},
+ {t:`Career Burnout Reset`,tag:`Plus`,sub:`5 detailed lessons · from running on empty to working alive`,
+  outline:[`What burnout actually is`,`Why rest alone doesn\u2019t fix it`,`Daily recovery`,`Renegotiating the job you have`,`Meaning, momentum, and leaving`],
+  lessons:[
+   {h:`What burnout actually is`,b:[
+     `Burnout is not "being a bit tired," and it is not a personal weakness — though it is routinely mistaken for both, often by the person experiencing it. The psychologist Christina Maslach, who built the standard scientific measure of burnout, defines it by three distinct signatures. <b>Exhaustion</b>: a depletion that rest no longer fully restores — you sleep and still wake empty. <b>Cynicism</b> (or depersonalisation): a protective detachment in which you go numb, irritable, or quietly contemptuous toward work you once cared about. <b>Reduced efficacy</b>: a creeping conviction that nothing you do really matters or works, however hard you try.`,
+     `Crucially, the World Health Organization classifies burnout as an <em>occupational phenomenon</em> — something that arises from chronic, unmanaged workplace stress — not as a medical defect inside the individual. This distinction matters enormously for how you treat it. You are not malfunctioning; you have been running an alarm system at full volume for far too long, frequently while being told that this is what passion and commitment look like.`,
+     `Burnout also rarely announces itself with a clear alarm. It arrives disguised as "just a busy quarter," repeated for six quarters; as a slow narrowing of life until work and recovering-from-work are all that\u2019s left; as a loss of small pleasures you don\u2019t even notice going. By the time the word "burnout" occurs to most people, they are usually well into it, which is why simply learning to recognise the three signatures by name is itself the first act of the reset.`,
+     `One more reframe worth holding: burnout is often the cost of caring, not of laziness. It tends to strike the conscientious, the over-responsible, and the genuinely invested hardest — the people who keep absorbing more because they cannot bear to let things drop. That is worth knowing, because it dismantles the cruellest internal story: that you burned out because you weren\u2019t good or strong enough. Usually the opposite was true.`],
+    try:`Score yourself from 1 to 10 on each of the three signatures: exhaustion, cynicism, and your sense of effectiveness. Don\u2019t fix anything today — just take an honest reading of the dashboard.`},
+   {h:`Why rest alone doesn\u2019t fix it`,b:[
+     `Here is the trap that catches almost everyone: you take a holiday, feel briefly human again, return to work — and crash within a week, sometimes within a day. People conclude from this that they are broken, when the real lesson is different. Burnout is usually a <b>mismatch problem</b>, not merely an energy-deficit problem, and a holiday tops up energy without touching the mismatch.`,
+     `Maslach\u2019s research identifies six areas where a person and their job can fall out of alignment, and a serious mismatch in any of them drives burnout. <b>Workload</b>: chronically more than is sustainable. <b>Control</b>: too little autonomy over how you do your work. <b>Reward</b>: insufficient recognition or fair pay. <b>Community</b>: a lack of trust and support among colleagues. <b>Fairness</b>: decisions that feel arbitrary or unjust. <b>Values</b>: being required to do work that contradicts who you are. Sleep can cure tiredness; it cannot cure a values conflict or an unfair, low-control role.`,
+     `This reframing is also a quiet act of self-forgiveness. If three of those six areas are badly misaligned, then no amount of green smoothies, morning routines, or gratitude journaling was ever going to fix it — and your "failure" to self-care your way out was never a failure of discipline. The equation was structurally rigged against you, and recognising that frees you to aim your energy where it can actually work.`,
+     `So the real diagnostic question is not "how do I rest more?" but "which of the six is most broken for me right now?" Naming the specific mismatch turns a vague, shame-soaked sense of failure into a concrete, addressable problem — and concrete problems, unlike free-floating despair, can be negotiated, changed, or, if necessary, left.`],
+    try:`Rate your job from 1 to 10 on each of the six areas — workload, control, reward, community, fairness, values. Circle the lowest one. That single number is your real target, not "tiredness."`},
+   {h:`Daily recovery: completing the cycle at work`,b:[
+     `While you work on the slower structural fix, daily recovery is what keeps you afloat — and two research threads make it far more effective than generic "self-care." The first is the stress cycle (Emily and Amelia Nagoski again): the stress your workday generates must be physically discharged — through movement, slow breathing, laughter, or connection — or it accumulates regardless of whether the work itself got resolved. Closing the laptop is not the same as closing the cycle.`,
+     `The second is <b>psychological detachment</b>, studied extensively by the organisational psychologist Sabine Sonnentag. Her research shows that genuinely switching off in the evening — not thinking about work, not checking messages — predicts recovery far more strongly than hours of passive rest spent with the work-brain still quietly running. Checking email at 11 p.m. doesn\u2019t merely cost you a few minutes; it cancels the recovery that the whole evening was supposed to provide, because it keeps the alarm humming all night.`,
+     `The practical tool is a <b>shutdown ritual</b>: a fixed end-time, a short written list of tomorrow\u2019s first few tasks (which lets the brain stop rehearsing them, trusting they\u2019re captured), and then a clear physical transition — a walk, a shower, a change of clothes, music, prayer, a commute used as a deliberate boundary. The ritual\u2019s job is to teach your nervous system, through repetition, that the workday has an actual border and that the rest of the day belongs to your life.`,
+     `Protect this border the way you\u2019d protect a meeting with your most important client — because, in effect, the client is your own capacity to keep going. A burnt-out person who works fourteen hours produces less, and worse, than a recovered person who works eight. Recovery is not the reward for productivity; it is one of its inputs.`],
+    try:`Design a 10-minute shutdown ritual and run it every workday this week: write tomorrow\u2019s top three tasks, close the laptop, then move your body briefly. Guard the time as non-negotiable.`},
+   {h:`Renegotiating the job you have`,b:[
+     `Before concluding that the only two options are "endure it forever" or "quit dramatically," there is a powerful middle path: renegotiation. The researchers Amy Wrzesniewski and Jane Dutton found that people in almost identical roles can experience them completely differently depending on <b>job crafting</b> — small, self-directed changes along three dimensions. <b>Task crafting</b>: doing marginally more of what energises you and less of what drains you, where you have any latitude. <b>Relational crafting</b>: shaping who you collaborate with and how. <b>Cognitive crafting</b>: reframing what the work is actually <em>for</em> — the hospital cleaner who sees themselves as part of patient healing, not just sanitation.`,
+     `Then there is the conversation most people avoid until it\u2019s too late: telling your manager, specifically and without drama, what has become unsustainable. Vague suffering earns only vague sympathy and no change. A specific, framed proposal earns decisions: "I can deliver X to a high standard, or X and Y to a mediocre one — which would you prefer?" Saying no to additional load while you are already burning out is not a bad attitude; it is accurate capacity reporting, and good managers would far rather hear it than discover it via a resignation.`,
+     `Watch especially for <b>boundary erosion</b> — the slow process by which every silently absorbed extra task teaches the system that your limits are negotiable, so the demands keep ratcheting up. Each time you quietly take on more than is sustainable to avoid a moment\u2019s friction, you re-train everyone\u2019s expectations, including your own. Boundaries at work, exactly as in families, are how you remain both genuinely useful and intact rather than burning out into uselessness.`,
+     `Renegotiation also buys you crucial information. If you ask clearly for what you need and the answer is a flat, repeated no, that is no longer ambiguous — it tells you something real and important about whether this environment can ever work for you, which is exactly what the final lesson is about.`],
+    try:`Pick one concrete renegotiation for this week: one task to drop, swap, or time-box — and one plain sentence to say it to your manager or team, without apology or over-explanation.`},
+   {h:`Meaning, momentum, and knowing when to leave`,b:[
+     `Recovery from burnout does not end at "less tired." It ends at <b>re-engagement</b> — caring again, feeling that effort connects to something. The Harvard researcher Teresa Amabile, after analysing thousands of workday diaries, identified the single biggest day-to-day driver of motivation and positive emotion: the <b>progress principle</b>. It is not big wins or external rewards but visible, small, daily progress on meaningful work that most reliably lifts people. Engineering tiny, completable wins back into your week — finishing things, seeing impact, tracking what moved — rebuilds the felt sense that what you do matters.`,
+     `Reconnect with purpose at a human scale, not a grandiose one. The instruction "find your one true passion" paralyses more people than it helps. The more useful questions are smaller and answerable: "Who, specifically, is helped by what I do?" and "Which parts of my day feel most like me?" Those parts are arrows pointing toward where more of your energy belongs, and you can often grow them gradually without burning everything down.`,
+     `Sometimes, though, the honest conclusion is that the environment itself is the illness — a values clash you cannot reconcile, a manager who will not change, a culture built on the very mismatch that is harming you. In that case leaving is not giving up; it is treatment. But leave like an adult rather than in a flare: build a financial buffer where you can, explore options before you jump, keep your professional story straight, and make it a decision rather than an escape. Quitting <em>toward</em> something considered is very different from fleeing in a single bad week.`,
+     `Through all of it, do not carry burnout in silence — isolation is one of its accelerants, and talking to people who genuinely understand (here, or among trusted colleagues) is itself restorative. And watch the line carefully: if exhaustion has slid into depression — persistent hopelessness, a numbness that follows you home, loss of interest in everything, or any thoughts of self-harm — bring in a professional without delay. That is not the end of your career story. In a great many lives, it turns out to be the chapter where the whole thing finally turned.`],
+    try:`Each evening this week, write one single line: "Today I moved this forward: ___." Watch, over the week, what that small record does to your sense of the work — and of yourself.`}
+ ]},
+
+ {t:`Sleeping Better`,tag:`Free`,sub:`4 lessons · gentle, practical steps toward real rest`,
+  outline:[`Why sleep matters so much`,`What wrecks your sleep`,`Building a wind-down`,`When the mind won't switch off`],
+  lessons:[
+   {h:`Why sleep matters so much`,b:[`Sleep is not lost time; it is when your brain files away the day, repairs your body, and resets your emotions. After a poor night, everything feels heavier, your patience is shorter, and small worries loom larger. This is not weakness; it is simply a tired brain.`,`The good news is that sleep responds well to small, consistent changes. You do not need a perfect routine, just a few steady habits your body can learn to trust.`],try:`For the next three nights, aim to wake at the same time each morning, even after a bad night. A steady wake time anchors everything else.`},
+   {h:`What quietly wrecks your sleep`,b:[`The usual culprits are familiar but easy to underestimate: caffeine too late in the day, bright screens close to bedtime, an irregular schedule, and lying in bed scrolling while wide awake. Each one nudges your body clock out of rhythm.`,`Alcohol is a sneaky one too; it can help you fall asleep but fragments the deeper rest later in the night, which is why you wake unrefreshed.`],try:`Pick the single biggest disruptor for you — late caffeine, late screens, or an irregular bedtime — and adjust just that one this week.`},
+   {h:`Building a wind-down`,b:[`Your body cannot slam from a busy day straight into sleep; it needs a runway. A wind-down is simply a short, repeated set of calming cues — dimming lights, a warm shower, a few pages of a book, slow breathing — that tell your nervous system the day is ending.`,`Keep your bed for sleep where you can, so your brain links it with rest rather than with worry or work.`],try:`Design a 20-minute wind-down tonight: lights down, screens away, something calm. Repeat it nightly so it becomes a signal, not a chore.`},
+   {h:`When the mind won't switch off`,b:[`Racing thoughts at night are incredibly common. Lying there trying to force sleep usually backfires, because effort and rest pull in opposite directions. The aim is to lower pressure, not add it.`,`If you are still awake after a while, it often helps to get up, do something quiet and dull in low light, and return to bed when you feel sleepy, rather than lying there fighting it.`],try:`Keep a notepad by the bed. When a worry or to-do circles, write it down to deal with tomorrow — it tells your mind it is safe to let go for now.`}
+ ]},
+ {t:`Healthier Relationships`,tag:`Plus`,sub:`4 lessons · being closer without losing yourself`,
+  outline:[`What healthy connection looks like`,`Listening that heals`,`Saying hard things kindly`,`Boundaries with love`],
+  lessons:[
+   {h:`What healthy connection looks like`,b:[`Healthy relationships are not the ones without conflict; they are the ones where both people feel safe, heard, and free to be themselves. Closeness and separateness can coexist — you can be deeply connected to someone and still remain your own person.`,`Trouble grows when feelings go unspoken and resentment builds quietly. Naming things gently, early, keeps connection clean.`],try:`Notice one thing you appreciate about someone close to you today, and actually say it out loud. Appreciation is the soil healthy relationships grow in.`},
+   {h:`Listening that heals`,b:[`Most people, when someone shares a problem, jump to fixing it. But often the other person does not want a solution; they want to feel understood. Being truly listened to is one of the most healing experiences there is, which is the whole reason this platform exists.`,`Real listening means putting your own response aside for a moment and reflecting back what you heard before you reply.`],try:`Next time someone shares something hard, resist fixing it. Just say, "that sounds really tough — tell me more." Watch what it does.`},
+   {h:`Saying hard things kindly`,b:[`Hard conversations go better when you speak about your own feelings rather than the other person's faults. "I feel hurt when plans change last minute" lands very differently from "you always cancel on me." One opens a door; the other starts a fight.`,`Pick a calm moment, keep it short, and stay steady even if they react. You are sharing, not accusing.`],try:`Think of one thing you have been avoiding saying. Draft it as "When ___ happens, I feel ___, and I would really like ___." Then say it gently.`},
+   {h:`Boundaries with love`,b:[`A boundary is not a wall against people you love; it is a line that says where you end and another begins. Said kindly, boundaries actually protect relationships, because the alternative — silent resentment — quietly poisons them.`,`You can care deeply about someone's feelings without being responsible for managing all of them, or obeying every expectation.`],try:`Find one small resentment you carry. Behind it is a boundary you have not voiced. Decide what that limit is — you do not have to act yet, just name it to yourself.`}
+ ]},
+ {t:`Building Confidence`,tag:`Plus`,sub:`4 lessons · quiet, durable self-belief`,
+  outline:[`Where confidence really comes from`,`Quieting the inner critic`,`Acting before you feel ready`,`Confidence that lasts`],
+  lessons:[
+   {h:`Where confidence really comes from`,b:[`Confidence is not a personality you are born with or without; it is built. And it does not come from telling yourself you are great — the mind quietly dismisses claims it has no evidence for. It comes from seeing yourself face things and cope.`,`That means the path to confidence runs through action, not through waiting to feel ready.`],try:`Write down three moments you handled something difficult, however small. This is evidence — your mind needs reminding that it exists.`},
+   {h:`Quieting the inner critic`,b:[`Almost everyone has a harsh inner voice, usually an old recording of criticism they absorbed long ago. You cannot delete it, but you can stop treating it as the truth. Notice it, name it ("there's that old voice again"), and answer it with something fairer.`,`Watch the word "should" especially — it is often someone else's rule, not yours.`],try:`For one day, simply count how often you criticise yourself. Do not fix anything yet. Awareness alone starts to loosen the grip.`},
+   {h:`Acting before you feel ready`,b:[`Most people wait to feel confident before they act. But confidence almost always follows action, not the other way round. Each time you do the thing you were unsure about and survive it, your brain updates its sense of what you can handle.`,`Start with small, slightly uncomfortable steps. They compound faster than you expect.`],try:`Pick one small thing you have been avoiding out of nerves, and do it this week. Notice that you coped — that is the lesson your confidence is built from.`},
+   {h:`Confidence that lasts`,b:[`Fragile confidence depends on always winning and never being judged. Durable confidence rests on something steadier: knowing you will treat yourself decently whether you succeed or fail. That is what lets you take risks without your whole sense of self riding on the outcome.`,`Keep your promises to yourself, however small. Self-trust is the real foundation underneath confidence.`],try:`Make one tiny promise to yourself for tomorrow and keep it. Repeat daily. You are quietly proving you can rely on yourself.`}
+ ]},
+ {t:`Easing Loneliness`,tag:`Free`,sub:`4 lessons · from disconnection toward belonging`,
+  outline:[`What loneliness really is`,`Why it can feel stuck`,`Small steps toward connection`,`Being your own company`],
+  lessons:[
+   {h:`What loneliness really is`,b:[`Loneliness is not about how many people are around you; it is about feeling unseen or unknown. You can feel deeply lonely in a crowd or a marriage, and quite content alone. It is a signal, like hunger or thirst, that you need more genuine connection.`,`Feeling it does not mean something is wrong with you. It means you are human and wired for belonging.`],try:`Name your loneliness honestly to yourself: "I feel lonely right now." Naming it, rather than judging it, takes away some of its sting.`},
+   {h:`Why it can feel stuck`,b:[`Loneliness has a cruel trick: it makes us assume others do not want us, so we withdraw — which deepens the very isolation we fear. Over time, reaching out can start to feel risky or pointless even when people would gladly connect.`,`Recognising this loop is the first step to gently stepping out of it.`],try:`Notice one assumption you make, like "they're too busy for me." Ask honestly: do you actually know that, or is it the loneliness talking?`},
+   {h:`Small steps toward connection`,b:[`Connection rarely arrives all at once; it is built from small, repeated moments. A message to an old friend, a few honest words instead of "I'm fine," showing up somewhere regularly. Depth matters more than numbers — one person who truly knows you outweighs a hundred acquaintances.`,`It can feel awkward at first. That awkwardness is normal and worth pushing through gently.`],try:`Send one message today to someone you have lost touch with — no agenda, just "you came to mind, how are you?"`},
+   {h:`Being your own company`,b:[`Part of easing loneliness is learning that your own company can be safe and even kind, rather than something to escape. The way you talk to yourself in quiet moments shapes how alone you feel. A gentler inner voice makes solitude feel less like exile.`,`Reaching out to others and being at peace with yourself are not opposites; they support each other.`],try:`Do one thing alone today that you genuinely enjoy, and treat it as good company rather than a gap to fill.`}
+ ]}
+];
+
+const ADMIN={
+ stats:[['Total users','1,284','+12%','users'],['Active listeners','6','+1','user-check'],['Sessions this month','347','+28%','calendar'],['Plus subscribers','218','+8%','trend'],['Active circles','6','0','chat'],['Avg. session rating','4.85','+0.1','star']],
+ activity:[['New professional application: Dr. Kavya M.','2h ago'],['Circle "Anxiety & Panic" reached 30 members','4h ago'],['12 new Plus subscriptions today','6h ago'],['Listener Arjun D. completed 200th session','1d ago'],['Emergency helpline link opened 3 times today','1d ago']],
+ listeners:[['Priya M.','Anxiety, Grief · Hindi, English','Active','142','4.9'],['Rohan K.','Stress, Relationships · English, Marathi','Active','98','4.7'],['Meera T.','Low mood, Loneliness · Hindi, Tamil','Inactive','67','4.8'],['Arjun D.','Trauma, Anxiety · English, Kannada','Active','201','5.0']],
+ pros:[['Dr. Ananya R.','Psychologist · ₹1200/session','Verified','89','4.9'],['Dr. Vikram S.','Psychiatrist · ₹1500/session','Verified','134','4.8'],['Dr. Kavya M.','Counsellor · ₹900/session','Pending','0','—'],['Dr. Rahul P.','Counsellor · ₹800/session','Verified','56','4.7']],
+ circles:[['Stress & Overwhelm','Priya S.','Active','24','18'],['Loneliness & Connection','Rohan K.','Active','18','12'],['Grief & Loss','Meera T.','Paused','11','7'],['Anxiety & Panic','Arjun D.','Active','31','22']]
+};
+
+/* ====================== HELPERS ====================== */
+const $=s=>document.querySelector(s);
+const content=$('#content');
+const TITLES={home:'Home',explore:'Explore',connect:'Connect',tools:'Tools',profile:'Profile',admin:'Admin'};
+function esc(s){return (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
+function waIcon(){return '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.1-.5 0a6.5 6.5 0 0 1-1.9-1.2 7.2 7.2 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4c0-.1-.5-1.3-.7-1.8s-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.6 4c.6.3 1.1.4 1.5.6a3.6 3.6 0 0 0 1.6.1c.5-.1 1.4-.6 1.6-1.1a2 2 0 0 0 .1-1.1c0-.1-.2-.2-.4-.3z"/></svg>';}
+function socialRow(){const S=[['Instagram','\u{1F4F7}'],['Threads','\u0040'],['X','\u2715'],['WhatsApp','\u{1F4AC}'],['Facebook','f'],['YouTube','\u25B6'],['Telegram','\u2708']];return '<div class="socials">'+S.map(s=>'<button class="soc" data-toast="Social links go live soon \u2014 follow us @theopenchair.">'+'<span class="sx">'+s[1]+'</span> '+s[0]+'</button>').join('')+'</div>';}
+let userName='', anonMode=true, todayMood=null;
+
+function setActive(nav){
+  document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===nav&&b.tagName==='BUTTON'&&b.classList.contains('active')!==undefined));
+  document.querySelectorAll('#sidenav button,#mobilenav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===nav));
+  $('#pageTitle').textContent=TITLES[nav]||'';
+}
+
+/* ====================== RENDERERS ====================== */
+function render(nav,sub,param){
+  stopSound(); stopBreath();
+  setActive(nav);
+  if(nav==='home') content.innerHTML=viewHome();
+  else if(nav==='explore') content.innerHTML = sub==='detail'?viewExploreDetail(param):viewExplore();
+  else if(nav==='connect'){
+    if(sub==='listeners') content.innerHTML=viewListeners();
+    else if(sub==='pros') content.innerHTML=viewPros();
+    else if(sub==='circles') content.innerHTML=viewCircles();
+    else if(sub==='sos') content.innerHTML=viewEmergency();
+    else content.innerHTML=viewConnect();
+  }
+  else if(nav==='tools'){
+    if(sub==='breath') content.innerHTML=viewBreathSession(param);
+    else content.innerHTML=viewTools();
+  }
+  else if(nav==='profile') content.innerHTML=viewProfile();
+  else if(nav==='admin'){ content.innerHTML=viewAdmin(sub||'overview'); }
+  wire();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function viewHome(){
+  const greet = userName? 'Welcome, '+esc(userName)+'.' : 'Welcome to The Open Chair.';
+  return `
+  <div class="view active">
+    <section class="hero">
+      <svg class="chair" viewBox="0 0 150 160"><rect x="40" y="14" width="70" height="78" rx="16"/><rect x="20" y="56" width="26" height="66" rx="13"/><rect x="104" y="56" width="26" height="66" rx="13"/><rect x="40" y="86" width="70" height="40" rx="12"/><line x1="34" y1="126" x2="30" y2="150"/><line x1="116" y1="126" x2="120" y2="150"/></svg>
+      <div class="eyebrow">The Open Chair</div>
+      <h1>${userName? 'Welcome, '+esc(userName)+'.<br>' : ''}<em>Beyond Silence</em> &mdash;<br>you are not alone.</h1>
+      <p class="sub">A safe, judgment-free space to talk, be heard, and find your way back to yourself.</p>
+    </section>
+
+
+    <div class="eyebrow" style="margin-top:30px;">What do you need today?</div>
+    <div class="actions">
+      <button class="act" data-go="connect|listeners" style="--ac:#F7B22E;"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 1 0-3.1 6.3L21 19l-.7-2.8A8 8 0 0 0 21 12z"/></svg></div><b>Talk to a Listener</b><small>Human conversation. Not therapy.</small></button>
+      <button class="act" data-go="connect|pros" style="--ac:#36CCA0;"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div><b>Book a Professional</b><small>Qualified counsellors.</small></button>
+      <button class="act" data-go="connect|circles" style="--ac:#C173F0;"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20v-1a5 5 0 0 1 5-5h2M13 20v-1a5 5 0 0 1 5-5h2"/></svg></div><b>Support Circles</b><small>Group support on WhatsApp.</small></button>
+      <button class="act" data-go="tools|" style="--ac:#3FB4F2;"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1"/></svg></div><b>Calming Tools</b><small>Audio, breathing &amp; courses.</small></button>
+      <button class="act sos" data-go="connect|sos" style="--ac:#F29A82;"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg></div><b>Emergency Support</b><small>Helplines, 24×7.</small></button>
+    </div>
+
+    <div class="eyebrow" style="margin-top:30px;">What others are working through</div>
+    <div class="chips">${['Managing work pressure','Family conflict','Financial stress','Loneliness','Relationship anxiety','Sleep & overthinking'].map(t=>`<button class="chip" data-go="explore|">${t}</button>`).join('')}</div>
+
+    <div class="eyebrow" style="margin-top:30px;">Daily reflection</div>
+    <div class="reflect"><p>"You do not have to solve your whole life today. Just take the next honest step."</p><span>Today's thought</span></div>
+
+    <div class="eyebrow" style="margin-top:30px;">Voices from the chair</div>
+    <div class="grid g2">
+      <div class="quote"><p>"I came in feeling overwhelmed. I left feeling heard."</p><small>Anonymous member</small></div>
+      <div class="quote"><p>"No one tried to fix me. Someone finally just listened. That changed everything."</p><small>Anonymous member</small></div>
+    </div>
+    <p style="text-align:center;color:var(--faint);font-size:11.5px;margin-top:14px;">All testimonials are anonymised. No real names are used without written consent.</p>
+
+    <div class="wa-banner">
+      <div><div class="eyebrow" style="margin-bottom:6px;">Always a message away</div>
+      <h2 style="font-family:var(--display);font-weight:430;font-size:22px;">Most of our support happens on WhatsApp.</h2>
+      <p class="sub" style="margin-top:6px;">Tell us how you are feeling and we will guide you to a Listener, a professional, or the right Circle — gently, and at your pace.</p></div>
+      <button class="btn wa-btn" data-toast="We will connect this to WhatsApp shortly.">${waIcon()} Chat on WhatsApp</button>
+    </div>
+
+    <div class="eyebrow" style="margin-top:30px;">Find us everywhere</div>
+    <p class="sub" style="margin-top:0;">We are here for you across all your favourite places — reach out anytime.</p>
+    ${socialRow()}
+  </div>`;
+}
+
+function viewExplore(){
+  return `<div class="view active">
+    <div class="eyebrow">Explore</div>
+    <h1>Whatever you're carrying,<br>there's a place for it here.</h1>
+    <p class="sub">Tap any area to understand it better, read a deeper dive, and connect with support that fits.</p>
+    <div class="grid g3" style="margin-top:18px;">
+      ${EXPLORE.map(c=>`<button class="tile" data-go="explore|detail|${c.id}" style="background:linear-gradient(150deg, color-mix(in srgb, ${c.c} 22%, #1d150d), #1b140d 76%);border-color:color-mix(in srgb,${c.c} 34%,transparent);">
+        <div class="ic" style="background:color-mix(in srgb,${c.c} 28%, transparent);color:${c.c};font-size:16px;">●</div>
+        <h3>${c.t}</h3><p>${c.topics}.</p><div class="more" style="color:${c.c}">Explore →</div></button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function viewExploreDetail(id){
+  const c=EXPLORE.find(x=>x.id===id)||EXPLORE[0];
+  return `<div class="view active">
+    <button class="back" data-go="explore|">← Back to Explore</button>
+    <div class="detail-hero" style="--cc:${c.c}">
+      <div class="dh-ic" style="color:${c.c}">●</div>
+      <div><div class="eyebrow" style="color:${c.c};margin-bottom:6px;">Explore</div><h1>${c.t}</h1><p class="sub" style="margin-top:4px;">${c.topics}</p></div>
+    </div>
+    <div class="twocol" style="margin-top:18px;">
+      <div class="panel-box"><div class="label">What it means</div><p style="margin-top:8px;color:var(--muted);font-size:14px;line-height:1.65;">${c.def}</p></div>
+      <div class="panel-box" style="border-color:${c.c}44;background:${c.c}11;"><div class="label" style="color:${c.c}">A note of hope</div><p style="margin-top:8px;font-style:italic;font-family:var(--display);font-size:15px;line-height:1.55;">${c.hope}</p></div>
+    </div>
+    <div class="eyebrow" style="margin-top:26px;">Areas within this topic</div>
+    <div class="grid g2">${c.areas.map(a=>`<div class="area"><i style="background:${c.c}"></i><div><b>${a[0]}</b><small>${a[1]}</small></div></div>`).join('')}</div>
+    <div class="deep">
+      <h4>Deep dive — research & insights</h4>
+      ${c.deep.map(d=>`<p><b>${d[0]}.</b> ${d[1]}</p>`).join('')}
+      <div class="disc">Educational only — this is general information, not medical advice, diagnosis, or treatment. If you are struggling, talking to a Listener or a qualified professional can help.</div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn" data-go="connect|listeners">Talk to a Listener</button>
+        <button class="btn ghost" data-go="connect|pros">Book a Professional</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function viewConnect(){
+  const card=(emoji,title,pill,pcls,text,go,bg)=>`<button class="tile" data-go="${go}" style="background:${bg}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div class="ic" style="background:rgba(244,236,220,.06);font-size:20px;">${emoji}</div><span class="pill ${pcls}">${pill}</span></div>
+    <h3 style="margin-top:6px;">${title}</h3><p>${text}</p><div class="more">Open →</div></button>`;
+  return `<div class="view active">
+    <div class="eyebrow">Connect</div>
+    <h1>However much support you need,<br>start here.</h1>
+    <div class="grid g2" style="margin-top:18px;">
+      ${card('🪑','Talk to a Listener','Peer support','warn','Speak to someone trained to listen with empathy and without judgment. Human conversation — not therapy.','connect|listeners','linear-gradient(160deg,#2a2014,#211913)')}
+      ${card('🌿','Book a Professional','Qualified','on','Connect with counsellors, psychologists, and coaches for deeper support when you need more than listening.','connect|pros','linear-gradient(160deg,#241c2a,#1b1722)')}
+      ${card('🤝','Support Circles','On WhatsApp','on','Small, facilitated group sessions for shared experiences. Our Circles run on WhatsApp so they stay simple and personal.','connect|circles','linear-gradient(160deg,#1d2620,#161c18)')}
+      ${card('⚠','Emergency Help','Crisis support','warn','Immediate crisis helplines, available 24×7. We are not an emergency service — these connect you to people who can help now.','connect|sos','linear-gradient(160deg,#2a1a18,#201413)')}
+    </div>
+    <div class="disc" style="margin-top:18px;">The Open Chair is not an emergency service. If you are in immediate danger, contact local emergency services or a crisis helpline. Listeners offer peer support, not therapy or medical care.</div>
+  </div>`;
+}
+
+function viewListeners(){
+  return `<div class="view active">
+    <button class="back" data-go="connect|">← Back to Connect</button>
+    <div class="eyebrow">Connect</div><h1>Talk to a Listener</h1>
+    <p class="sub">Peer support · human conversation · not therapy. Our Listeners are not therapists — they are trained, compassionate people who are here to hear you.</p>
+    <div class="notice" style="margin-top:16px;">Sample Listener profiles shown for now. To talk to a Listener, tap <b>Chat on WhatsApp</b> — we will connect you privately and gently, with no forms to fill.</div>
+    <div class="grid g2">
+      ${LISTENERS.map(l=>`<div class="person">
+        <div class="row"><div class="avatar" style="background:${l.col}">${l.n.split(' ').map(w=>w[0]).join('')}</div>
+          <div style="flex:1"><h4>${l.n} <span class="pill ${l.on==='Online'?'on':'warn'}">● ${l.on}</span></h4>
+          <div class="meta">★ ${l.rt} · ${l.ses} sessions · ${l.wait}</div></div></div>
+        <span class="desc">${l.d}</span>
+        <div class="tags">${l.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+        <div class="meta" style="margin-top:8px;">🗣 ${l.lang}</div>
+        <button class="btn" style="width:100%;justify-content:center;margin-top:12px;" data-toast="We will connect this to WhatsApp shortly.">${waIcon()} Chat on WhatsApp</button>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function viewPros(){
+  return `<div class="view active">
+    <button class="back" data-go="connect|">← Back to Connect</button>
+    <div class="eyebrow">Connect</div><h1>Book a Professional</h1>
+    <p class="sub">Psychologist · psychiatrist · counsellor · coach. For deeper support when you need more than listening.</p>
+    <div class="notice" style="margin-top:16px;">Sample profiles shown for now. Every professional will be verified and credentialed (including registration checks) before being listed. To book, tap <b>Book on WhatsApp</b> and we will arrange a session for you directly.</div>
+    <div class="grid g2">
+      ${PROS.map(p=>`<div class="person">
+        <div class="row"><div class="avatar" style="background:${p.col}">${p.n.replace('Dr. ','').split(' ').map(w=>w[0]).join('')}</div>
+          <div style="flex:1"><h4>${p.n} <span class="pill warn">Sample</span></h4>
+          <div class="meta">${p.role} · ★ ${p.rt} · ${p.exp}</div></div></div>
+        <span class="desc">${p.d}</span>
+        <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+          <div class="meta">Next: ${p.next}</div><b style="color:var(--amber);font-size:14px;">${p.fee} / session</b></div>
+        <button class="btn" style="width:100%;justify-content:center;margin-top:12px;" data-toast="We will connect this to WhatsApp shortly.">${waIcon()} Book on WhatsApp</button>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function viewCircles(){
+  return `<div class="view active">
+    <button class="back" data-go="connect|">← Back to Connect</button>
+    <div class="eyebrow">Connect</div><h1>Support Circles</h1>
+    <p class="sub">Small groups of people going through something similar, meeting to listen and feel less alone. To keep them personal and simple, our Circles run on WhatsApp.</p>
+    <div class="wa-banner" style="margin-top:16px;">
+      <div><h2 style="font-family:var(--display);font-weight:430;font-size:20px;">How to join a Circle</h2>
+      <p class="sub" style="margin-top:6px;">Message us on WhatsApp and tell us what you are going through. We will gently add you to the Circle that fits — no forms, no pressure.</p></div>
+      <button class="btn wa-btn" data-toast="We will connect this to WhatsApp shortly.">${waIcon()} Join via WhatsApp</button>
+    </div>
+    <div class="eyebrow" style="margin-top:26px;">Circles we run</div>
+    <div class="grid g2">
+      ${CIRCLES.map(c=>`<div class="person" style="border-color:${c.col}33;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><h4>${c.t}</h4><span class="pill on">${c.when.split(',')[0]}</span></div>
+        <span class="desc">${c.d}</span>
+        <div class="tags">${c.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      </div>`).join('')}
+    </div>
+    <div class="disc">Circles are peer support, not group therapy. They are a space to be heard alongside others who understand.</div>
+  </div>`;
+}
+
+function viewEmergency(){
+  return `<div class="view active">
+    <button class="back" data-go="connect|">← Back to Connect</button>
+    <div class="eyebrow" style="color:var(--rose)">Connect</div><h1>Emergency Support</h1>
+    <p class="sub">Immediate help · available 24×7</p>
+    <div class="sosbanner" style="margin-top:16px;"><b>The Open Chair is not an emergency service.</b> If you are in immediate danger or experiencing a mental health crisis, please contact your local emergency services or one of the helplines below right now.</div>
+    <div class="grid g2">
+      ${HELPLINES.map(h=>`<div class="help"><h4>${h.n}</h4><p>${h.d}</p>
+        <div class="calls">${h.calls.map((c,i)=>`<a class="${i>0?'alt':''}" href="${c[1]}">📞 ${c[0]}</a>`).join('')}</div></div>`).join('')}
+    </div>
+    <div class="reflect" style="margin-top:16px;"><p>"You do not have to face this alone. Reaching out is not weakness — it is one of the bravest things a person can do. Help is available, and you deserve it."</p></div>
+  </div>`;
+}
+
+function viewTools(){
+  const audio = AUDIO.map(g=>`<div class="label" style="margin:18px 0 8px;color:var(--sage)">${g.g}</div>
+    <div class="sounds">${g.items.map(it=>`<button class="sound" data-sound='${JSON.stringify(it)}'>
+      <span class="pp"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span>
+      <span style="flex:1"><b>${it.n}</b><small>${it.s}</small></span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>`).join('')}</div>`).join('');
+  const breaths = Object.entries(BREATH).map(([k,b])=>`<button class="tile" data-go="tools|breath|${k}" style="text-align:left;">
+    <h3>${b.t}</h3><p>${b.note}</p><div style="margin-top:8px;font-size:11.5px;color:var(--amber-2);font-weight:600;">${b.rounds} rounds \u00b7 3-sec rest between each</div><div class="more" style="margin-top:8px;">Start \u2192</div></button>`).join('');
+  const courses = COURSES.map((c,ci)=>`<div class="course" data-course="${ci}">
+    <div class="chead"><div class="crow"><div><h4>${c.t}</h4><div class="ct">${c.sub}</div></div><span class="tag ${c.tag==='Free'?'free':'plus'}">${c.tag}</span></div>
+      <p>${c.outline.map((o,i)=>`${i+1}. ${o}`).join('  ·  ')}</p>
+      <button class="btn" style="margin-top:12px;" data-coursetoggle="${ci}">Start course</button></div>
+    <div class="cbody">${c.lessons.map((l,li)=>`<details class="lesson"><summary><span class="ln">${li+1}</span>${l.h}</summary>
+      <div class="lb">${l.b.map(p=>`<p>${p}</p>`).join('')}<div class="try"><b>Try this</b>${l.try}</div></div></details>`).join('')}</div>
+  </div>`).join('');
+  return `<div class="view active">
+    <div class="eyebrow">Tools</div><h1>Small practices, steady ground.</h1>
+
+    <div class="panel-box" style="margin-top:18px;">
+      <h3 style="font-family:var(--display);font-weight:430;font-size:18px;">Calming Audio · Sound Journeys</h3>
+      <p class="sub" style="margin-top:4px;">Audio experiences designed to support relaxation, focus, and emotional grounding. Twenty calming soundscapes, generated live — tap to play, tap again to stop. Best with headphones.</p>
+      ${audio}
+      <div class="disc">Offered for comfort, not as treatment for any condition. Evidence on sound- and music-based support is still developing, so we describe these by how they feel, not by health claims.</div>
+    </div>
+
+    <div class="panel-box" style="margin-top:14px;">
+      <h3 style="font-family:var(--display);font-weight:430;font-size:18px;">Guided Breathing</h3>
+      <p class="sub" style="margin-top:4px;">Follow the circle — it expands as you breathe in and softens as you breathe out.</p>
+      <div class="breath-grid" style="margin-top:14px;">${breaths}</div>
+    </div>
+
+
+    <div class="panel-box" style="margin-top:14px;">
+      <h3 style="font-family:var(--display);font-weight:430;font-size:18px;">Self-Help Courses</h3>
+      <p class="sub" style="margin-top:4px;">Written paths you can read at your own pace — researched, practical, and gentle. Educational only, not a substitute for professional care.</p>
+      <div class="grid" style="margin-top:14px;gap:12px;">${courses}</div>
+    </div>
+  </div>`;
+}
+
+function viewBreathSession(key){
+  const b=BREATH[key]||BREATH.reset;
+  return `<div class="view active">
+    <button class="back" data-go="tools|">← Back to Tools</button>
+    <div class="eyebrow">Tools · Breathing</div><h1 style="text-align:center;">${b.t}</h1>
+    <p class="sub" style="text-align:center;margin:8px auto 0;">${b.note}</p>
+    <div class="breath-session">
+      <div class="borb" id="borb"><span id="borbT">Ready</span></div>
+      <div class="ph" id="phase">Press begin</div>
+      <div class="ct" id="count">—</div>
+      <div id="round" style="color:var(--faint);font-size:13px;margin-top:8px;">${b.rounds} rounds \u00b7 a 3-second rest follows each round</div>
+      <button class="btn" id="breathStart" data-key="${key}" style="margin-top:16px;">Begin</button>
+    </div>
+  </div>`;
+}
+
+function viewProfile(){
+  const signed = !!userName;
+  const initials = signed ? userName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : 'OC';
+  return `<div class="view active">
+    <div class="eyebrow">Profile</div>
+    <div class="phead"><div class="avatar" style="background:linear-gradient(135deg,#F4B45E,#F29A82)">${signed?esc(initials):'\u{1F642}'}</div>
+      <div><h1 style="font-size:24px;">${signed?esc(userName):'Welcome, friend'}</h1>
+      <div class="meta" style="color:var(--faint);font-size:13px;margin-top:2px;">${signed?'Signed in \u00b7 your name shows across The Open Chair':'You are browsing anonymously'}</div></div></div>
+
+    ${signed?'':`<div class="panel-box" style="margin-top:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
+      <div><b style="font-size:14.5px;">Make it yours</b><div style="color:var(--faint);font-size:12.5px;margin-top:2px;">Sign in to have your name greet you. You can stay anonymous anytime.</div></div>
+      <button class="btn" id="profileSignIn">Sign in</button></div>`}
+
+    <div class="panel-box" style="margin-top:14px;">
+      <div class="setting"><div><b>Privacy &amp; your data</b><small>We collect as little as possible, and you can ask us to delete it anytime under India's DPDP Act, 2023.</small></div><button class="linkrow" data-toast="We will connect this to WhatsApp shortly.">Contact us</button></div>
+      <div class="setting"><div><b>Emergency contacts</b><small>Helplines are always one tap away on the Connect page.</small></div><button class="linkrow" data-go="connect|sos">View</button></div>
+      <div class="setting"><div><b>Help &amp; support</b><small>Questions about The Open Chair? We are happy to help.</small></div><button class="linkrow" data-toast="We will connect this to WhatsApp shortly.">Message us</button></div>
+    </div>
+
+    <div class="panel-box" style="margin-top:14px;text-align:center;">
+      <b style="font-size:14.5px;">Subscription plans are coming soon.</b>
+      <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-top:6px;">For now, everything here is free. When we add plans, peer listening will always stay free.</p>
+    </div>
+
+    <div class="eyebrow" style="margin-top:26px;">Find us everywhere</div>
+    <p class="sub" style="margin-top:0;">Reach out on whichever platform you are most comfortable with — we are always ready to help.</p>
+    ${socialRow()}
+
+    <footer>
+      <b>A note on care.</b> The Open Chair offers peer support, education, and access to professionals — it is not therapy and not an emergency service, and it does not replace medical care. In crisis, call Tele-MANAS 14416 or your local emergency services.<br><br>
+      <b>A note on your privacy.</b> Mental health is deeply personal. We are committed to consent, collecting as little as possible, and your right to deletion under India's Digital Personal Data Protection Act, 2023.<br><br>
+      © 2026 The Open Chair · Beyond Silence — you are not alone.
+    </footer>
+  </div>`;
+}
+
+/* ---------- ADMIN ---------- */
+function viewAdmin(sub){
+  const navItem=(k,label)=>`<button data-admin="${k}" class="${sub===k?'active':''}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:${sub===k?'rgba(230,167,101,.14)':'transparent'};border:none;color:${sub===k?'var(--cream)':'var(--muted)'};font-size:14px;font-weight:500;padding:11px 14px;border-radius:10px;${sub===k?'box-shadow:inset 2px 0 0 var(--amber);':''}">${label}</button>`;
+  let body='';
+  if(sub==='overview'){
+    body=`<h1>Platform Overview</h1>
+      <div class="notice" style="margin-top:14px;">Sample analytics for demonstration. Real numbers appear once the app is connected to its backend.</div>
+      <div class="grid g3" style="margin-top:4px;">${ADMIN.stats.map(s=>`<div class="astat"><div class="top"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div><span class="delta">${s[2]}</span></div><b>${s[1]}</b><small>${s[0]}</small></div>`).join('')}</div>
+      <div class="panel-box" style="margin-top:16px;"><div style="display:flex;justify-content:space-between;"><b>Recent activity</b><span style="color:var(--amber);font-size:12px;">View all</span></div>
+        ${ADMIN.activity.map(a=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13.5px;"><span>${a[0]}</span><span style="color:var(--faint);flex:none;">${a[1]}</span></div>`).join('')}</div>`;
+  } else if(sub==='listeners'){
+    body=`<div style="display:flex;justify-content:space-between;align-items:center;"><h1>Peer Listeners</h1><button class="btn">+ Add listener</button></div>
+      <input class="srch" placeholder="Search listeners…" style="margin-top:16px;">
+      <table><tr><th>Listener</th><th>Status</th><th>Sessions</th><th>Rating</th><th></th></tr>
+      ${ADMIN.listeners.map(l=>`<tr><td><b>${l[0]}</b><br><span style="color:var(--faint);font-size:12px;">${l[1]}</span></td><td><span class="pill ${l[2]==='Active'?'on':'warn'}">${l[2]}</span></td><td>${l[3]}</td><td>★ ${l[4]}</td><td style="color:var(--faint);">✎ 🗑</td></tr>`).join('')}</table>`;
+  } else if(sub==='pros'){
+    body=`<div style="display:flex;justify-content:space-between;align-items:center;"><h1>Professionals</h1><button class="btn">+ Add professional</button></div>
+      <div class="notice" style="margin-top:14px;">Professionals must be verified and credentialed before being published to users.</div>
+      ${ADMIN.pros.map(p=>`<div class="person" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div><b>${p[0]}</b> <span class="pill ${p[2]==='Verified'?'on':'warn'}">${p[2]}</span><br><span style="color:var(--faint);font-size:12px;">${p[1]} · ${p[3]} sessions · ★ ${p[4]}</span></div>
+        ${p[2]==='Pending'?'<div style="display:flex;gap:8px;"><button class="btn" style="padding:8px 14px;">Approve</button><button class="btn ghost" style="padding:8px 14px;">Reject</button></div>':'<span style="color:var(--faint)">✎</span>'}</div></div>`).join('')}`;
+  } else if(sub==='circles'){
+    body=`<div style="display:flex;justify-content:space-between;align-items:center;"><h1>Support Circles</h1><button class="btn">+ New circle</button></div>
+      ${ADMIN.circles.map(c=>`<div class="person" style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><b>${c[0]}</b> <span class="pill ${c[2]==='Active'?'on':'warn'}">${c[2]}</span><br><span style="color:var(--faint);font-size:12px;">Facilitated by ${c[1]} · 👥 ${c[3]} members · ${c[4]} sessions held</span></div>
+        <span style="color:var(--faint)">👁 ✎ 🗑</span></div></div>`).join('')}`;
+  } else if(sub==='users'){
+    body=`<h1>Users</h1><div class="notice" style="margin-top:14px;">User records are protected. In the live app, admin access is role-limited and logged, and members can request deletion at any time under the DPDP Act.</div>
+      <input class="srch" placeholder="Search users…"><table><tr><th>Member</th><th>Type</th><th>Joined</th><th>Status</th></tr>
+      ${[['anon_4821','Anonymous','Mar 2026','Active'],['Arjun M.','Named','Feb 2026','Active · Plus'],['anon_5567','Anonymous','Mar 2026','Active'],['Neha S.','Named','Jan 2026','Active']].map(u=>`<tr><td>${u[0]}</td><td>${u[1]}</td><td>${u[2]}</td><td><span class="pill on">${u[3]}</span></td></tr>`).join('')}</table>`;
+  } else {
+    body=`<h1>Platform Settings</h1>
+      <div class="panel-box" style="margin-top:16px;"><div class="label">Configuration</div>
+        <div class="setting"><div><b>Max circle size</b><small>Maximum members per support circle</small></div><b>30</b></div>
+        <div class="setting"><div><b>Default session duration</b><small>Default booking slot length</small></div><b>60 min</b></div>
+        <div class="setting"><div><b>New user notifications</b><small>Notify admin when new users register</small></div><div class="toggle on"></div></div>
+        <div class="setting"><div><b>Maintenance mode</b><small>Show maintenance page to all users</small></div><div class="toggle"></div></div>
+      </div>
+      <button class="btn" style="margin-top:14px;width:100%;justify-content:center;">Save settings</button>`;
+  }
+  return `<div class="view active"><div style="display:flex;gap:24px;align-items:flex-start;">
+    <div style="width:200px;flex:none;">
+      <div style="font-family:var(--display);font-size:17px;">Admin</div><div style="color:var(--faint);font-size:12px;margin-bottom:14px;">The Open Chair</div>
+      ${navItem('overview','Overview')}${navItem('listeners','Listeners')}${navItem('pros','Professionals')}${navItem('circles','Circles')}${navItem('users','Users')}${navItem('settings','Settings')}
+      <button data-nav="home" style="margin-top:14px;background:none;border:none;color:var(--faint);font-size:12.5px;">← Back to app</button>
+    </div>
+    <div style="flex:1;min-width:0;">${body}</div>
+  </div></div>`;
+}
+
+/* ====================== INTERACTIONS ====================== */
+function wire(){
+  document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>{
+    const [n,s,p]=el.dataset.go.split('|'); render(n,s||'',p||'');
+  }));
+  document.querySelectorAll('[data-admin]').forEach(el=>el.addEventListener('click',()=>render('admin',el.dataset.admin)));
+  document.querySelectorAll('[data-toast]').forEach(el=>el.addEventListener('click',()=>toast(el.dataset.toast)));
+
+  // mood
+  const reply=$('#moodReply'), rt=$('#moodReplyText');
+  document.querySelectorAll('#moodChips .chip').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('#moodChips .chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
+    todayMood={label:c.dataset.label,emoji:c.dataset.emoji,h:+c.dataset.h};
+    rt.innerHTML=c.dataset.reply+' <a href="#" id="mlink">Talk to someone →</a>'; reply.classList.add('show');
+    $('#mlink').addEventListener('click',e=>{e.preventDefault();render('connect','listeners');});
+  }));
+
+  // audio
+  document.querySelectorAll('.sound').forEach(b=>b.addEventListener('click',()=>toggleSound(JSON.parse(b.dataset.sound),b)));
+
+  // journaling
+  document.querySelectorAll('#prompts .prompt').forEach(p=>p.addEventListener('click',()=>{
+    document.querySelectorAll('#prompts .prompt').forEach(x=>x.classList.remove('on')); p.classList.add('on');
+    const ta=$('#journal'); ta.placeholder=p.textContent+' …'; ta.focus();
+  }));
+  const sj=$('#saveJ'); if(sj) sj.addEventListener('click',()=>{const ta=$('#journal'); if(ta.value.trim())ta.value=''; $('#savedJ').classList.remove('hidden');});
+
+  // courses
+  document.querySelectorAll('[data-coursetoggle]').forEach(b=>b.addEventListener('click',()=>{
+    b.closest('.course').classList.toggle('open');
+  }));
+
+  // breathing session
+  const bs=$('#breathStart'); if(bs) bs.addEventListener('click',()=>startBreath(bs.dataset.key));
+
+  // anon toggle
+  const at=$('#anonToggle'); if(at){
+    const flip=()=>{anonMode=!anonMode; render('profile');};
+    at.addEventListener('click',flip);
+    at.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}});
+  }
+  // profile sign-in
+  const ps=$('#profileSignIn'); if(ps) ps.addEventListener('click',()=>{$('#gate').classList.remove('hidden'); const g=$('#gn'); if(g){g.value='';g.focus();}});
+  // plain toggles (settings)
+  document.querySelectorAll('.toggle:not(#anonToggle)').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+}
+
+// top nav
+document.addEventListener('click',e=>{const b=e.target.closest('[data-nav]'); if(b){render(b.dataset.nav,'');}});
+function updateSignIn(){const b=$('#signInBtn'); if(b) b.textContent = userName ? ('Hi, '+userName.split(' ')[0]) : 'Sign in';}
+$('#signInBtn').addEventListener('click',()=>{ if(userName){ render('profile',''); } else { $('#gate').classList.remove('hidden'); const g=$('#gn'); if(g){g.value='';g.focus();} } });
+
+/* ----- admin passcode (owner only) ----- */
+const ADMIN_PASS='2580';
+let adminUnlocked=false;
+function tryAdmin(){ if($('#adminPass').value===ADMIN_PASS){ adminUnlocked=true; $('#adminGate').classList.add('hidden'); $('#adminErr').textContent=''; render('admin',''); } else { $('#adminErr').textContent='Incorrect passcode \u2014 try again.'; $('#adminPass').value=''; $('#adminPass').focus(); } }
+$('#adminBtn').addEventListener('click',()=>{ if(adminUnlocked){ render('admin',''); return; } $('#adminGate').classList.remove('hidden'); $('#adminPass').value=''; $('#adminErr').textContent=''; $('#adminPass').focus(); });
+$('#adminEnter').addEventListener('click',tryAdmin);
+$('#adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryAdmin();});
+$('#adminCancel').addEventListener('click',()=>$('#adminGate').classList.add('hidden'));
+
+/* ----- toast ----- */
+let toastT;
+function toast(msg){
+  let el=$('#toast'); if(!el){el=document.createElement('div');el.id='toast';
+    el.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#2c2218;border:1px solid var(--line);color:var(--cream);font-size:13px;padding:12px 18px;border-radius:12px;z-index:200;max-width:90vw;text-align:center;box-shadow:0 16px 40px -12px rgba(0,0,0,.7);';
+    document.body.appendChild(el);}
+  el.textContent=msg; el.style.opacity='1'; clearTimeout(toastT); toastT=setTimeout(()=>el.style.opacity='0',2600);
+}
+
+/* ----- breathing engine ----- */
+let bTimers=[];
+function stopBreath(){bTimers.forEach(clearTimeout);bTimers=[];}
+function startBreath(key){
+  stopBreath();
+  const b=BREATH[key]||BREATH.reset, orb=$('#borb'), ot=$('#borbT'), ph=$('#phase'), ct=$('#count'), rd=$('#round');
+  if(!orb) return;
+  const rounds=b.rounds||5;
+  let round=1, i=0;
+  const sb=$('#breathStart'); if(sb) sb.textContent='Restart';
+  const countdown=(n,after)=>{ct.textContent=n; const tick=()=>{n--; if(n>=1){ct.textContent=n; bTimers.push(setTimeout(tick,1000));}}; bTimers.push(setTimeout(tick,1000)); bTimers.push(setTimeout(after,n*1000));};
+  const phase=()=>{
+    if(i>=b.pat.length){
+      if(round>=rounds){ ph.textContent='Complete'; ot.textContent='Done'; ct.textContent='\u2713'; if(rd) rd.textContent='All '+rounds+' rounds complete \u00b7 well done'; orb.style.transition='transform 1s ease'; orb.style.transform='scale(.72)'; if(sb) sb.textContent='Begin again'; return; }
+      round++; i=0;
+      ph.textContent='Rest'; ot.textContent='Rest'; if(rd) rd.textContent='Short break \u00b7 round '+round+' of '+rounds+' next';
+      orb.style.transition='transform 1s ease'; orb.style.transform='scale(.8)';
+      countdown(3, phase); return;
+    }
+    const [label,secs]=b.pat[i];
+    if(rd) rd.textContent='Round '+round+' of '+rounds;
+    ph.textContent=label; ot.textContent=label.split(' ')[0];
+    const expand=label==='Breathe in', hold=label.indexOf('Hold')===0;
+    if(!hold){orb.style.transition='transform '+secs+'s ease-in-out'; orb.style.transform=expand?'scale(1)':'scale(.7)';}
+    i++; countdown(secs, phase);
+  };
+  phase();
+}
+
+/* ----- audio engine ----- */
+let actx=null,current=null;
+function stopSound(){
+  if(current&&actx){current.gains.forEach(g=>{try{g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+0.7);}catch(e){}});
+    const old=current; setTimeout(()=>old.nodes.forEach(n=>{try{n.stop()}catch(e){}}),800); current=null;}
+  document.querySelectorAll('.sound').forEach(s=>s.classList.remove('playing'));
+}
+function noiseBuf(){const len=actx.sampleRate*2,b=actx.createBuffer(1,len,actx.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;return b;}
+function toggleSound(it,btn){
+  if(btn.classList.contains('playing')){stopSound();return;}
+  stopSound();
+  actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended')actx.resume();
+  const nodes=[],gains=[],t=actx.currentTime;
+  const out=(g,v,r=2.4)=>{g.gain.value=0.0001;g.connect(actx.destination);g.gain.exponentialRampToValueAtTime(v,t+r);gains.push(g);};
+  if(it.type==='tone'){
+    [[it.base,.045],[it.base*1.5,.014],[it.base*2,.008]].forEach(([f,v],i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;
+      const lfo=actx.createOscillator(),lg=actx.createGain();lfo.frequency.value=.06+i*.04;lg.gain.value=v*.35;lfo.connect(lg);lg.connect(g.gain);o.connect(g);out(g,v);o.start();lfo.start();nodes.push(o,lfo);});
+  }else if(it.type==='chord'){
+    it.f.forEach(([f,v],i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;
+      const lfo=actx.createOscillator(),lg=actx.createGain();lfo.frequency.value=.07+i*.03;lg.gain.value=v*.4;lfo.connect(lg);lg.connect(g.gain);o.connect(g);out(g,v);o.start();lfo.start();nodes.push(o,lfo);});
+  }else if(it.type==='noise'){
+    const s=actx.createBufferSource();s.buffer=noiseBuf();s.loop=true;const fl=actx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=it.tone;fl.Q.value=it.q||.7;const g=actx.createGain();s.connect(fl);fl.connect(g);out(g,.05,3);s.start();nodes.push(s);
+  }else if(it.type==='ocean'){
+    const s=actx.createBufferSource();s.buffer=noiseBuf();s.loop=true;const fl=actx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=700;fl.Q.value=.8;const g=actx.createGain();
+    const lfo=actx.createOscillator(),lg=actx.createGain();lfo.frequency.value=.09;lg.gain.value=.028;lfo.connect(lg);lg.connect(g.gain);s.connect(fl);fl.connect(g);out(g,.04,3);s.start();lfo.start();nodes.push(s,lfo);
+  }else if(it.type==='pulse'){
+    const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=it.base;const lfo=actx.createOscillator(),lg=actx.createGain();lfo.frequency.value=.9;lg.gain.value=.04;lfo.connect(lg);lg.connect(g.gain);
+    const o2=actx.createOscillator(),g2=actx.createGain();o2.type='sine';o2.frequency.value=it.base/2;o.connect(g);o2.connect(g2);out(g,.045);out(g2,.03);o.start();o2.start();lfo.start();nodes.push(o,o2,lfo);
+  }
+  current={nodes,gains}; btn.classList.add('playing');
+}
+
+/* ----- gate ----- */
+function enter(){ userName=$('#gn').value.trim(); if(userName) anonMode=false; $('#gate').classList.add('hidden'); updateSignIn(); render('home',''); }
+$('#enterBtn').addEventListener('click',enter);
+$('#anonBtn').addEventListener('click',()=>{$('#gn').value='';userName='';enter();});
+$('#gn').addEventListener('keydown',e=>{if(e.key==='Enter')enter();});
+$('#gateSos').addEventListener('click',()=>{$('#gate').classList.add('hidden');render('connect','sos');});
+
+render('home','');
+</script>
+</body>
+</html>
