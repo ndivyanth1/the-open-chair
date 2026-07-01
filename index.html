@@ -1248,7 +1248,7 @@ function toggleSound(it,btn){
    any 6-digit code logs the person in locally and nothing is stored. */
 let pendingSignup=null;
 function authShow(v){document.querySelectorAll('#gate [data-auth]').forEach(d=>d.classList.toggle('hidden',d.dataset.auth!==v));}
-function openGate(){$('#gate').classList.remove('hidden');authShow('choose');var e=$('#loginPhone');if(e)e.value='';}
+function openGate(){pendingSignup=null;window.pendingSignup=null;$('#gate').classList.remove('hidden');authShow('choose');var e=$('#loginPhone');if(e)e.value='';}
 function closeGate(){$('#gate').classList.add('hidden');}
 function finishAuth(name){userName=(name||'').trim();if(userName)anonMode=false;closeGate();updateSignIn();render('home','');}
 function authNoAccount(){toast('No account found for this number \u2014 please create an account first.');openGate();authShow('signup');var er=$('#suErr');if(er)er.textContent='Please create your account to continue.';}
@@ -1287,13 +1287,13 @@ function googleLogin(){
 function _on(id,ev,fn){var el=$('#'+id);if(el)el.addEventListener(ev,fn);}
 _on('googleBtn','click',googleLogin);
 _on('googleBtn2','click',googleLogin);
-_on('sendOtpBtn','click',()=>sendOtp(($('#loginPhone')||{}).value));
-_on('loginPhone','keydown',e=>{if(e.key==='Enter')sendOtp($('#loginPhone').value);});
+_on('sendOtpBtn','click',()=>{pendingSignup=null;window.pendingSignup=null;sendOtp(($('#loginPhone')||{}).value);});
+_on('loginPhone','keydown',e=>{if(e.key==='Enter'){pendingSignup=null;window.pendingSignup=null;sendOtp($('#loginPhone').value);}});
 _on('verifyOtpBtn','click',verifyOtp);
 _on('otpInput','keydown',e=>{if(e.key==='Enter')verifyOtp();});
 _on('signupBtn','click',doSignup);
 _on('toSignup','click',()=>authShow('signup'));
-_on('toLogin','click',()=>authShow('choose'));
+_on('toLogin','click',()=>{pendingSignup=null;window.pendingSignup=null;authShow('choose');});
 _on('gateClose','click',closeGate);
 _on('gate','click',function(e){if(e.target&&e.target.id==='gate')closeGate();});
 _on('otpEdit','click',()=>authShow('choose'));
