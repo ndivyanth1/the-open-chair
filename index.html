@@ -1251,6 +1251,8 @@ function authShow(v){document.querySelectorAll('#gate [data-auth]').forEach(d=>d
 function openGate(){$('#gate').classList.remove('hidden');authShow('choose');var e=$('#loginPhone');if(e)e.value='';}
 function closeGate(){$('#gate').classList.add('hidden');}
 function finishAuth(name){userName=(name||'').trim();if(userName)anonMode=false;closeGate();updateSignIn();render('home','');}
+function authNoAccount(){toast('No account found for this number \u2014 please create an account first.');openGate();authShow('signup');var er=$('#suErr');if(er)er.textContent='Please create your account to continue.';}
+window.authNoAccount=authNoAccount;
 function _digits(s){return (s||'').replace(/\D/g,'');}
 function sendOtp(phone){var d=_digits(phone);var er=$('#otpErr');
   if(d.length<10){toast('Please enter a valid 10-digit mobile number.');return;}
@@ -1306,7 +1308,8 @@ render('home','');
 <div id="recaptcha-container"></div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   const firebaseConfig = {
     apiKey: "AIzaSyC4gT2TInd0v5YI2nieC9JAJs98E4mnZ2k",
     authDomain: "the-open-chair.firebaseapp.com",
@@ -1317,15 +1320,41 @@ render('home','');
   };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
   setPersistence(auth, browserLocalPersistence).catch(function(e){console.warn(e);});
   window.fbGoogle = function(){ return signInWithPopup(auth, new GoogleAuthProvider()); };
-  function recaptcha(){ if(!window._recaptcha){ window._recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size:'invisible' }); } return window._recaptcha; }
-  window.fbSendOtp = function(phoneE164){ return signInWithPhoneNumber(auth, phoneE164, recaptcha()); };
-  onAuthStateChanged(auth, function(user){
-    if(user && typeof window.finishAuth === 'function'){
-      var nm = user.displayName || (window.pendingSignup && window.pendingSignup.first) || 'Friend';
-      window.pendingSignup = null;
-      window.finishAuth(nm);
+  function freshRecaptcha(){
+    if(window._recaptcha){ try{ window._recaptcha.clear(); }catch(e){} window._recaptcha=null; }
+    window._recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size:'invisible' });
+    return window._recaptcha;
+  }
+  window.fbSendOtp = function(phoneE164){ return signInWithPhoneNumber(auth, phoneE164, freshRecaptcha()); };
+  onAuthStateChanged(auth, async function(user){
+    if(!user || typeof window.finishAuth !== 'function') return;
+    try{
+      const ref = doc(db,'users',user.uid);
+      const snap = await getDoc(ref);
+      if(snap.exists()){
+        const pr = snap.data(); window.pendingSignup=null;
+        window.finishAuth(pr.first || user.displayName || 'Friend'); return;
+      }
+      if(window.pendingSignup){
+        const p = window.pendingSignup;
+        await setDoc(ref,{first:p.first||'',middle:p.middle||'',last:p.last||'',email:p.email||'',phone:p.phone||(user.phoneNumber||''),provider:'phone',createdAt:Date.now()});
+        window.pendingSignup=null; window.finishAuth(p.first||'Friend'); return;
+      }
+      const isGoogle = (user.providerData||[]).some(function(pd){return pd.providerId==='google.com';});
+      if(isGoogle){
+        const nm=(user.displayName||'').trim(); const first=nm.split(' ')[0]||'Friend';
+        await setDoc(ref,{first:first,last:nm.split(' ').slice(1).join(' '),email:user.email||'',phone:user.phoneNumber||'',provider:'google',createdAt:Date.now()});
+        window.finishAuth(first); return;
+      }
+      await signOut(auth);
+      if(typeof window.authNoAccount==='function') window.authNoAccount();
+    }catch(e){
+      console.error('profile check failed (is Firestore enabled?)', e);
+      window.finishAuth(user.displayName || (window.pendingSignup&&window.pendingSignup.first) || 'Friend');
+      window.pendingSignup=null;
     }
   });
 </script>
