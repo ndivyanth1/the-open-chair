@@ -1252,28 +1252,36 @@ function openGate(){$('#gate').classList.remove('hidden');authShow('choose');var
 function closeGate(){$('#gate').classList.add('hidden');}
 function finishAuth(name){userName=(name||'').trim();if(userName)anonMode=false;closeGate();updateSignIn();render('home','');}
 function _digits(s){return (s||'').replace(/\D/g,'');}
-function sendOtp(phone){var d=_digits(phone);
-  // FIREBASE: window.confirmationResult = await signInWithPhoneNumber(auth,'+91'+d,window.recaptchaVerifier);
+function sendOtp(phone){var d=_digits(phone);var er=$('#otpErr');
   if(d.length<10){toast('Please enter a valid 10-digit mobile number.');return;}
-  var to=$('#otpTo');if(to)to.textContent='+91 '+d;
-  authShow('otp');var oi=$('#otpInput');if(oi){oi.value='';oi.focus();}var er=$('#otpErr');if(er)er.textContent='';}
+  if(!window.fbSendOtp){toast('Sign-in is still loading — please try again in a moment.');return;}
+  var btn=$('#sendOtpBtn');if(btn){btn.disabled=true;btn.textContent='Sending\u2026';}
+  window.fbSendOtp('+91'+d).then(function(confirmation){
+    window.confirmationResult=confirmation;
+    var to=$('#otpTo');if(to)to.textContent='+91 '+d;
+    authShow('otp');var oi=$('#otpInput');if(oi){oi.value='';oi.focus();}if(er)er.textContent='';
+  }).catch(function(e){console.error(e);toast('Could not send OTP. Please check the number and try again.');})
+   .finally(function(){if(btn){btn.disabled=false;btn.textContent='Send OTP';}});}
 function verifyOtp(){var code=_digits(($('#otpInput')||{}).value);var er=$('#otpErr');
   if(code.length!==6){if(er)er.textContent='Please enter the 6-digit code.';return;}
-  // FIREBASE: await window.confirmationResult.confirm(code);  // then read profile
-  if(pendingSignup){finishAuth(pendingSignup.first);pendingSignup=null;}
-  else finishAuth('Friend');}
+  if(!window.confirmationResult){if(er)er.textContent='Please request a new code.';return;}
+  var btn=$('#verifyOtpBtn');if(btn){btn.disabled=true;btn.textContent='Verifying\u2026';}
+  window.confirmationResult.confirm(code).then(function(){ /* onAuthStateChanged completes sign-in */ })
+   .catch(function(e){console.error(e);if(er)er.textContent='That code did not match. Please try again.';})
+   .finally(function(){if(btn){btn.disabled=false;btn.textContent='Verify \u0026 continue';}});}
 function doSignup(){var f=$('#suFirst').value.trim(),mid=$('#suMiddle').value.trim(),l=$('#suLast').value.trim(),
   e=$('#suEmail').value.trim(),ph=$('#suPhone').value.trim(),er=$('#suErr');
   if(!f||!l||!e||!ph){if(er)er.textContent='Please add your name, email and mobile number.';return;}
   if(!/^\S+@\S+\.\S+$/.test(e)){if(er)er.textContent='Please enter a valid email address.';return;}
   if(_digits(ph).length<10){if(er)er.textContent='Please enter a valid mobile number.';return;}
   if(er)er.textContent='';
-  pendingSignup={first:f,middle:mid,last:l,email:e,phone:_digits(ph)};
+  pendingSignup={first:f,middle:mid,last:l,email:e,phone:_digits(ph)};window.pendingSignup=pendingSignup;
   // FIREBASE: create account, then verify phone with OTP (or send email verification)
   sendOtp(ph);}
 function googleLogin(){
-  // FIREBASE: const r=await signInWithPopup(auth,new GoogleAuthProvider()); finishAuth(r.user.displayName);
-  finishAuth('Friend');}
+  if(!window.fbGoogle){toast('Sign-in is still loading — please try again in a moment.');return;}
+  window.fbGoogle().then(function(r){ /* onAuthStateChanged completes sign-in */ })
+   .catch(function(e){console.error(e);if(e&&e.code==='auth/popup-closed-by-user')return;toast('Google sign-in did not complete. Please try again.');});}
 function _on(id,ev,fn){var el=$('#'+id);if(el)el.addEventListener(ev,fn);}
 _on('googleBtn','click',googleLogin);
 _on('googleBtn2','click',googleLogin);
@@ -1294,6 +1302,32 @@ const WA_NUMBER='918197871618';
 document.addEventListener('click',function(e){var el=e.target.closest?e.target.closest('[data-wa]'):null;if(!el)return;var t=encodeURIComponent(el.getAttribute('data-wa')||'Hi, I found The Open Chair and wanted to reach out.');window.open('https://wa.me/'+WA_NUMBER+'?text='+t,'_blank','noopener');});
 
 render('home','');
+</script>
+<div id="recaptcha-container"></div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4gT2TInd0v5YI2nieC9JAJs98E4mnZ2k",
+    authDomain: "the-open-chair.firebaseapp.com",
+    projectId: "the-open-chair",
+    storageBucket: "the-open-chair.firebasestorage.app",
+    messagingSenderId: "818052086405",
+    appId: "1:818052086405:web:02d8f7deb0a1c0b71e47ec"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  setPersistence(auth, browserLocalPersistence).catch(function(e){console.warn(e);});
+  window.fbGoogle = function(){ return signInWithPopup(auth, new GoogleAuthProvider()); };
+  function recaptcha(){ if(!window._recaptcha){ window._recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size:'invisible' }); } return window._recaptcha; }
+  window.fbSendOtp = function(phoneE164){ return signInWithPhoneNumber(auth, phoneE164, recaptcha()); };
+  onAuthStateChanged(auth, function(user){
+    if(user && typeof window.finishAuth === 'function'){
+      var nm = user.displayName || (window.pendingSignup && window.pendingSignup.first) || 'Friend';
+      window.pendingSignup = null;
+      window.finishAuth(nm);
+    }
+  });
 </script>
 </body>
 </html>
