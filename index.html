@@ -63,7 +63,7 @@
   ::-webkit-scrollbar{width:11px;height:11px;}
   ::-webkit-scrollbar-thumb{background:rgba(246,238,223,.12);border-radius:99px;border:3px solid transparent;background-clip:content-box;}
   ::-webkit-scrollbar-thumb:hover{background:rgba(246,238,223,.22);background-clip:content-box;}
-  button{font-family:var(--body);cursor:pointer;}
+  button{font-family:var(--body);cursor:pointer;color:inherit;}
   .hidden{display:none!important;}
 
   /* ---------- LAYOUT ---------- */
@@ -1111,7 +1111,7 @@ function viewEmergency(){
 
 function viewTools(){
   const audio = AUDIO.map(g=>`<div class="label" style="margin:18px 0 8px;color:var(--sage)">${g.g}</div>
-    <div class="sounds">${g.items.map(it=>`<button class="sound" data-sound='${JSON.stringify(it)}'>
+    <div class="sounds">${g.items.map(it=>`<button class="sound" data-sound='${JSON.stringify(it).replace(/'/g,"&#39;")}'>
       <span class="pp"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span>
       <span style="flex:1"><b>${it.n}</b><small>${it.s}</small></span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>`).join('')}</div>`).join('');
   const breaths = Object.entries(BREATH).map(([k,b])=>`<button class="tile" data-go="tools|breath|${k}" style="text-align:left;">
