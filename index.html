@@ -677,6 +677,34 @@ html{scrollbar-color:rgba(244,180,94,.35) transparent;}
     </div>
   </aside>
 
+  <div id="terms" class="hidden" style="position:fixed;inset:0;z-index:120;background:rgba(13,10,7,.94);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;">
+    <div style="background:var(--card,#1b1510);border:1px solid var(--line);border-radius:18px;max-width:640px;width:100%;max-height:88vh;overflow:auto;padding:26px 24px;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;">
+        <h2 style="font-family:var(--display);font-weight:560;font-size:22px;margin:0;color:var(--cream);">Terms &amp; Conditions</h2>
+        <button id="termsClose" style="background:none;border:none;color:var(--faint);font-size:24px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>
+      </div>
+      <p style="color:var(--faint);font-size:12px;margin:0 0 14px;">Version 1.0 &middot; The Open Chair &mdash; a peer-support space</p>
+      <div style="color:var(--muted);font-size:13.5px;line-height:1.62;">
+        <div style="background:rgba(217,88,74,.12);border-left:3px solid #d9584a;padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:14px;">
+          <b style="color:#e88;">If you are in crisis, please do not use this site for emergency help.</b> Call <a href="tel:14416" style="color:var(--amber);">Tele-MANAS 14416</a> (free, 24&times;7) or your local emergency number. The Open Chair is not an emergency service.
+        </div>
+        <p>By using theopenchair.in you agree to these Terms. The Open Chair is operated from Bengaluru, Karnataka, India.</p>
+        <p><b style="color:var(--cream);">1. What we are.</b> The Open Chair is a <b style="color:var(--cream);">non-clinical peer-support platform</b> offering warm, judgement-free companionship and self-guided wellbeing content. We are <b style="color:var(--cream);">not</b> a medical, psychiatric, psychological, or counselling service, not a substitute for professional care, and not an emergency service. Our Listeners are peers offering lived-experience support, not necessarily licensed professionals. Always consult a qualified professional for medical or mental-health concerns.</p>
+        <p><b style="color:var(--cream);">2. Crisis.</b> If you may be at risk, we will gently share crisis resources such as Tele-MANAS 14416 and, where possible, follow up personally. We cannot guarantee monitoring or intervention and do not provide real-time crisis response. Never rely on The Open Chair as your only source of help in an emergency.</p>
+        <p><b style="color:var(--cream);">3. Age.</b> The Service is open to all, including students. If you are under 18, please use it with the involvement and consent of a parent or guardian. We may seek verifiable parental consent as required under India's DPDP Act, 2023.</p>
+        <p><b style="color:var(--cream);">4. Your account &amp; conduct.</b> Provide accurate information, keep your login secure, and use the Service respectfully and lawfully. Do not harass, abuse, or harm others, or post unlawful, hateful, or explicit content. We may suspend access for any breach.</p>
+        <p><b style="color:var(--cream);">5. How support works.</b> Support may be provided by the founder and, as we grow, by trained Listeners. Where helpful, we may suggest you consider a professional; the choice is always yours. We respond on a best-effort basis with no promised response time.</p>
+        <p><b style="color:var(--cream);">6. Records.</b> We may keep brief written notes of support conversations for continuity, safety, and quality. See our privacy commitments for detail. Confidentiality is not absolute: we may disclose where needed to protect life or where required by law.</p>
+        <p><b style="color:var(--cream);">7. Payments.</b> The Service is free at launch. Paid plans and paid professional sessions are planned, priced differently from peer conversations, with terms shown clearly before any payment.</p>
+        <p><b style="color:var(--cream);">8. Content &amp; IP.</b> All content, the name "The Open Chair", "Beyond Silence", and the logo are owned by or licensed to us for your personal, non-commercial use only. Educational content is general information, not personalised advice.</p>
+        <p><b style="color:var(--cream);">9. Disclaimer &amp; liability.</b> The Service is provided "as is", without warranties. To the fullest extent permitted by law, The Open Chair and its team are not liable for any indirect or consequential loss, or for decisions you make based on the Service or any peer conversation. Nothing here excludes liability that cannot lawfully be excluded.</p>
+        <p><b style="color:var(--cream);">10. Governing law.</b> These Terms are governed by the laws of India; the courts at Bengaluru, Karnataka have jurisdiction.</p>
+        <p><b style="color:var(--cream);">11. Contact.</b> Questions or grievances: <b style="color:var(--cream);">grievance@theopenchair.in</b> &middot; General: <b style="color:var(--cream);">hello@theopenchair.in</b>.</p>
+        <p style="font-size:11.5px;color:var(--faint);margin-top:14px;">The Open Chair currently operates as a sole-proprietor venture based in Bengaluru, Karnataka. These Terms are provided in good faith and may be updated; significant changes will be noted here.</p>
+      </div>
+    </div>
+  </div>
+
   <main>
     <div class="topbar">
       <h2 id="pageTitle">Home</h2>
@@ -1213,7 +1241,7 @@ function viewProfile(){
     <footer>
       <b>A note on care.</b> The Open Chair offers peer support, education, and access to professionals — it is not therapy and not an emergency service, and it does not replace medical care. In crisis, call Tele-MANAS 14416 or your local emergency services.<br><br>
       <b>A note on your privacy.</b> Mental health is deeply personal. We are committed to consent, collecting as little as possible, and your right to deletion under India's Digital Personal Data Protection Act, 2023.<br><br>
-      © 2026 The Open Chair · Beyond Silence — you are not alone.
+      © 2026 The Open Chair · Beyond Silence — you are not alone. &nbsp;·&nbsp; <a href="#" id="openTerms" style="color:var(--amber);text-decoration:none;">Terms &amp; Conditions</a>
     </footer>
   </div>`;
 }
@@ -1399,6 +1427,13 @@ let pendingSignup=null;
 function authShow(v){document.querySelectorAll('#gate [data-auth]').forEach(d=>d.classList.toggle('hidden',d.dataset.auth!==v));}
 function openGate(){pendingSignup=null;window.pendingSignup=null;$('#gate').classList.remove('hidden');authShow('choose');var e=$('#loginPhone');if(e)e.value='';}
 function closeGate(){$('#gate').classList.add('hidden');}
+function openTerms(){var t=$('#terms');if(t)t.classList.remove('hidden');}
+function closeTerms(){var t=$('#terms');if(t)t.classList.add('hidden');}
+document.addEventListener('click',function(e){
+  var o=e.target.closest('#openTerms');if(o){e.preventDefault();openTerms();return;}
+  var c=e.target.closest('#termsClose');if(c){e.preventDefault();closeTerms();return;}
+  if(e.target&&e.target.id==='terms'){closeTerms();}
+});
 function finishAuth(name){userName=(name||'').trim();if(userName)anonMode=false;closeGate();updateSignIn();render('home','');}
 function authNoAccount(){toast('No account found for this number \u2014 please create an account first.');openGate();authShow('signup');var er=$('#suErr');if(er)er.textContent='Please create your account to continue.';}
 window.authNoAccount=authNoAccount;
