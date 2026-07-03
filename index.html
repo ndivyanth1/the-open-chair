@@ -639,7 +639,7 @@ html{scrollbar-color:rgba(244,180,94,.35) transparent;}
       <input id="otpInput" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="• • • • • •" class="authinput otpfield">
       <div id="otpErr" class="autherr"></div>
       <button class="btn" id="verifyOtpBtn" style="width:100%;justify-content:center;margin-top:6px;">Verify &amp; continue</button>
-      <p class="authnote">Demo mode — enter any 6 digits to continue. Real OTP turns on once the backend is connected.</p>
+      <p class="authnote">The code arrives by SMS and can take a few seconds. Please don't share it with anyone.</p>
     </div>
     <div data-auth="signup" class="hidden">
       <p class="authsub">Create your account</p>
@@ -653,7 +653,7 @@ html{scrollbar-color:rgba(244,180,94,.35) transparent;}
       <p class="authswitch">Already have an account? <button class="linkbtn" id="toLogin">Sign in</button></p>
     </div>
     <div class="gatecrisis"><button id="gateSos">In crisis right now? Get help →</button></div>
-    <small class="gatedisc">A working preview — accounts are in demo mode (no real OTP or payments yet). The Open Chair offers peer support, not therapy, and is not an emergency service.</small>
+    <small class="gatedisc">The Open Chair offers peer support, not therapy, and is not an emergency service.</small>
   </div>
 </div>
 
@@ -1392,11 +1392,10 @@ function toggleSound(it,btn){
   if(actx.state==='suspended'){ actx.resume().then(build).catch(build); } else { build(); }
 }
 
-/* ----- auth (DEMO MODE) -----------------------------------------
-   Real mobile-OTP and Google sign-in need a backend. The UI below is
-   complete and wired to clean hook points marked  // FIREBASE:  .
-   To activate, follow the steps in the activation guide. In demo mode,
-   any 6-digit code logs the person in locally and nothing is stored. */
+/* ----- auth (LIVE — Firebase) -----------------------------------
+   Mobile-OTP and Google sign-in are wired to Firebase Auth below at
+   the hook points marked  // FIREBASE:  . OTP codes are verified
+   against Firebase; there is no demo fallback. */
 let pendingSignup=null;
 function authShow(v){document.querySelectorAll('#gate [data-auth]').forEach(d=>d.classList.toggle('hidden',d.dataset.auth!==v));}
 function openGate(){pendingSignup=null;window.pendingSignup=null;$('#gate').classList.remove('hidden');authShow('choose');var e=$('#loginPhone');if(e)e.value='';}
